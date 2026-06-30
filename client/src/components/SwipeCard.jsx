@@ -225,7 +225,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 }}>
                   <span style={{
                     fontSize: '14px', fontWeight: '400',
-                    color: heroTextColor,
+                    color: '#ffffff',
                     fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
                     lineHeight: 1.45,
                   }}>
