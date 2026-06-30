@@ -436,19 +436,15 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
 
            </div>
 
-        </div>
+          {/* Bottom gradient — end of scroll content */}
+          <div style={{
+            height: '200px',
+            background: 'linear-gradient(to top, #000000 0%, #000000 25%, transparent 100%)',
+            pointerEvents: 'none',
+            flexShrink: 0,
+          }} />
 
-        {/* Bottom gradient — always visible */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '200px',
-          background: 'linear-gradient(to top, #000000 0%, #000000 25%, transparent 100%)',
-          pointerEvents: 'none',
-          zIndex: 5,
-        }} />
+        </div>
       </div>
 
       {/* Preview Overlay — persists until tap or drag dismiss */}
