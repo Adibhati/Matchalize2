@@ -58,6 +58,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const corsOrigins = [
   FRONTEND_URL,
   /^http:\/\/localhost(:\d+)?$/,
+  /^https?:\/\/.*\.onrender\.com$/,
   /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/,
   /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/,
   /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+(:\d+)?$/,
@@ -96,7 +97,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
       imgSrc: ["'self'", 'data:', 'https://*.cloudinary.com', 'https://images.unsplash.com', 'https://res.cloudinary.com'],
-      connectSrc: ["'self'", 'ws://localhost:*', 'http://localhost:*', 'ws://192.168.*:*', 'http://192.168.*:*', 'ws://10.*:*', 'http://10.*:*', 'ws://172.20.*:*', 'http://172.20.*:*'],
+      connectSrc: ["'self'", 'ws://localhost:*', 'http://localhost:*', 'https://*.onrender.com', 'ws://192.168.*:*', 'http://192.168.*:*', 'ws://10.*:*', 'http://10.*:*', 'ws://172.20.*:*', 'http://172.20.*:*'],
     },
   },
   crossOriginEmbedderPolicy: false,
