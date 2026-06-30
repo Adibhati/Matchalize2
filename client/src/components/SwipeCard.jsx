@@ -300,26 +300,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               </div>
             )}
 
-            {/* Academic Info */}
-            {(user.branch || user.year) && (
-              <div className="bento-row">
-                {user.branch && (
-                  <div className="bento-block glass-bento bento-col-half">
-                    <span className="material-symbols-outlined" style={{ fontSize: '16.5px', color: '#f97316', marginBottom: '4px' }}>school</span>
-                    <div style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '1px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', fontFamily: 'Geist, sans-serif' }}>Major</div>
-                    <div style={{ fontSize: '16.5px', fontWeight: '600', color: '#fff', marginTop: '2px', fontFamily: 'Geist, sans-serif' }}>{user.branch}</div>
-                  </div>
-                )}
-                {user.year && (
-                  <div className="bento-block glass-bento bento-col-half">
-                    <span className="material-symbols-outlined" style={{ fontSize: '16.5px', color: '#f97316', marginBottom: '4px' }}>calendar_month</span>
-                    <div style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '1px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', fontFamily: 'Geist, sans-serif' }}>Year</div>
-                    <div style={{ fontSize: '16.5px', fontWeight: '600', color: '#fff', marginTop: '2px', fontFamily: 'Geist, sans-serif' }}>{user.year}</div>
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Prompt 1 + Image 1 */}
             {prompts[0] && (
               <div className="bento-row" style={{ height: '220px' }}>
@@ -371,7 +351,8 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
 
                   >
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
-                    <div className="bento-header" style={{ color: 'rgba(255,255,255,0.4)', position: 'relative', zIndex: 1 }}>
+                    <div className="bento-header" style={{ color: '#fb923c', position: 'relative', zIndex: 1 }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '14.4px', fontVariationSettings: "'FILL' 1" }}>chat_bubble</span>
                       {prompts[1].question}
                     </div>
                     <div style={{ fontSize: '16.5px', color: '#fff', fontStyle: 'italic', fontWeight: '500', lineHeight: 1.4, marginTop: '8px', fontFamily: 'Inter, sans-serif', textShadow: '0 0 12px rgba(249,115,22,0.25)', position: 'relative', zIndex: 1 }}>
@@ -493,7 +474,23 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               }}
             >
               {preview.type === 'image' ? (
-                <img src={preview.src} style={{ width: '100%', display: 'block' }} alt="Preview" />
+                <div style={{
+                  width: '100%',
+                  aspectRatio: '3 / 4',
+                  maxHeight: '70vh',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: '#000',
+                }}>
+                  <img src={preview.src} style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }} alt="Preview" />
+                </div>
               ) : (
                 <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '14px', minHeight: '180px', justifyContent: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
