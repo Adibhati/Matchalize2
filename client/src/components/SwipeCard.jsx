@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import { useAppConfig } from '../utils/AppConfigContext';
 
@@ -9,6 +9,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
   const x = useMotionValue(0);
   const longPressTimer = useRef(null);
   const [preview, setPreview] = useState(null);
+  const [heroTextColor, setHeroTextColor] = useState('#ffffff');
 
   const rotate = useTransform(x, [-200, 200], [-8, 8]);
 
@@ -25,9 +26,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
     }
   }, []);
 
-  const [showBottomGrad, setShowBottomGrad] = useState(false);
-  const scrollRef = useRef(null);
-
   const dismissPreview = useCallback(() => {
     setPreview(null);
   }, []);
@@ -37,9 +35,37 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
     onPointerUp: handlePointerUp,
   }) : () => ({});
 
-  if (!user) return null;
+  const mainImg = user?.photos && user.photos.length > 0 ? user.photos[0] : null;
 
-  const mainImg = user.photos && user.photos.length > 0 ? user.photos[0] : null;
+  useEffect(() => {
+    if (!mainImg) { setHeroTextColor('#ffffff'); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const sampleHeight = Math.min(100, img.height);
+        canvas.width = img.width;
+        canvas.height = sampleHeight;
+        ctx.drawImage(img, 0, img.height - sampleHeight, img.width, sampleHeight, 0, 0, img.width, sampleHeight);
+        const imageData = ctx.getImageData(0, 0, img.width, sampleHeight);
+        const pixels = imageData.data;
+        let totalLuminance = 0;
+        for (let i = 0; i < pixels.length; i += 4) {
+          totalLuminance += 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
+        }
+        const avg = totalLuminance / (pixels.length / 4);
+        setHeroTextColor(avg > 128 ? '#000000' : '#ffffff');
+      } catch {
+        setHeroTextColor('#ffffff');
+      }
+    };
+    img.onerror = () => setHeroTextColor('#ffffff');
+    img.src = mainImg;
+  }, [mainImg]);
+
+  if (!user) return null;
   const extraImgs = user.photos ? user.photos.slice(1) : [];
   const prompts = user.prompts || [];
   const interests = user.interests || [];
@@ -176,7 +202,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {/* Line 1: Name, age */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                 <span style={{
-                  fontSize: '50px', fontWeight: '700', color: '#ffffff',
+                  fontSize: '50px', fontWeight: '700', color: heroTextColor,
                   letterSpacing: '-0.02em', lineHeight: 1.15,
                   fontFamily: 'Geist, sans-serif',
                 }}>
@@ -184,7 +210,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 </span>
                 {user.age && (
                   <span style={{
-                    fontSize: '19px', fontWeight: '400', color: 'rgba(255,255,255,0.55)',
+                    fontSize: '19px', fontWeight: '400', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
                     lineHeight: 1.15,
                   }}>
                     {user.age}
@@ -196,12 +222,12 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {(user.branch || user.year) && (
                 <div style={{ marginTop: '2px' }}>
                   <span style={{
-                    fontSize: '13px', fontWeight: '500', color: 'rgba(255,255,255,0.5)',
+                    fontSize: '13px', fontWeight: '500', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
                     letterSpacing: '0.3px', lineHeight: 1.3,
                     fontFamily: 'Inter, sans-serif',
                   }}>
                     {user.branch}
-                    {user.branch && user.year && <span style={{ margin: '0 5px', color: 'rgba(255,255,255,0.25)' }}>·</span>}
+                    {user.branch && user.year && <span style={{ margin: '0 5px', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)' }}>·</span>}
                     {user.year}
                   </span>
                 </div>
@@ -211,14 +237,14 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {user.bio && (
                 <div style={{
                   marginTop: '8px',
-                  borderLeft: '2px solid #f97316',
+                  borderLeft: `2px solid ${heroTextColor === '#ffffff' ? '#f97316' : '#ea580c'}`,
                   paddingLeft: '10px',
                   paddingTop: '2px',
                   paddingBottom: '2px',
                 }}>
                   <span style={{
                     fontSize: '13px', fontWeight: '400',
-                    color: 'rgba(255,255,255,0.55)',
+                    color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
                     fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
                     lineHeight: 1.45,
                   }}>
