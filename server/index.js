@@ -97,7 +97,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
       imgSrc: ["'self'", 'data:', 'https://*.cloudinary.com', 'https://images.unsplash.com', 'https://res.cloudinary.com'],
-      connectSrc: ["'self'", 'ws://localhost:*', 'http://localhost:*', 'https://*.onrender.com', 'ws://192.168.*:*', 'http://192.168.*:*', 'ws://10.*:*', 'http://10.*:*', 'ws://172.20.*:*', 'http://172.20.*:*'],
+      connectSrc: ["'self'", 'ws://localhost:*', 'http://localhost:*', 'https://*.onrender.com', 'https://fonts.googleapis.com'],
     },
   },
   crossOriginEmbedderPolicy: false,

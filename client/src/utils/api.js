@@ -1,7 +1,7 @@
-// Dynamically use the current hostname but point to port 5005 for the backend
 const apiHostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
 const API_PORT = import.meta.env.VITE_API_PORT || '5005';
-export const API_BASE = import.meta.env.VITE_API_URL || `http://${apiHostname}:${API_PORT}`;
+const isDev = apiHostname === 'localhost' || apiHostname === '127.0.0.1';
+export const API_BASE = import.meta.env.VITE_API_URL || (isDev ? `http://${apiHostname}:${API_PORT}` : window.location.origin);
 const BASE_URL = `${API_BASE}/api`;
 export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || API_BASE;
 
