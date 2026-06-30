@@ -155,7 +155,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               right: 0,
               zIndex: 2,
               background: 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
-              padding: '20px 20px calc(60px + 30px) 20px',
+              padding: '60px 20px calc(60px + 15px) 20px',
               pointerEvents: 'none',
             }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
