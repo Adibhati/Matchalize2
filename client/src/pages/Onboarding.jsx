@@ -24,6 +24,7 @@ const Onboarding = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [uploadingIdx, setUploadingIdx] = useState(null);
 
     // Form Fields State
   const [formData, setFormData] = useState({
@@ -88,6 +89,7 @@ const Onboarding = () => {
     if (!file) return;
 
     setError('');
+    setUploadingIdx(idx);
     try {
       const data = await api.upload(file);
       const updated = [...formData.photos];
@@ -95,6 +97,8 @@ const Onboarding = () => {
       updateField('photos', updated);
     } catch (err) {
       setError('Failed to upload photo. Please try again.');
+    } finally {
+      setUploadingIdx(null);
     }
   };
 
@@ -495,86 +499,119 @@ const Onboarding = () => {
 
             {/* STEP 4: Photos */}
             {step === 4 && (
-              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1, display: 'flex', flexDirection: 'column' }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Add your photos</h2>
-                <p style={stepSubtitleStyle}>Upload up to 4 photos to show your campus style (tap to upload).</p>
+                <p style={stepSubtitleStyle}>Upload up to 4 photos to show your campus style.</p>
 
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(2, 1fr)',
                   gap: '12px',
-                  marginBottom: '10px',
+                  marginTop: '8px',
+                  flex: 1,
+                  alignContent: 'start',
                 }}>
-                  {formData.photos.map((photo, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        height: '140px',
-                        borderRadius: '20px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.02)',
-                        border: '0.5px solid rgba(255, 255, 255, 0.08)',
-                        overflow: 'hidden',
-                        position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {photo ? (
-                        <>
-                          <img
-                            src={photo}
-                            alt={`Upload ${idx + 1}`}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          />
-                          <button
-                            onClick={(e) => handleClearImage(e, idx)}
-                            style={{
-                              position: 'absolute',
-                              top: '8px',
-                              right: '8px',
-                              width: '24px',
-                              height: '24px',
-                              borderRadius: '50%',
-                              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                              border: 'none',
-                              color: '#fff',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '12px',
-                              cursor: 'pointer',
-                              zIndex: 10,
-                            }}
-                          >
-                            ×
-                          </button>
-                        </>
-                      ) : (
-                        <label style={{
-                          width: '100%',
-                          height: '100%',
+                  {formData.photos.map((photo, idx) => {
+                    const isUploading = uploadingIdx === idx;
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          aspectRatio: '3 / 4',
+                          borderRadius: '20px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                          border: photo ? 'none' : `1px dashed rgba(255, 255, 255, 0.12)`,
+                          overflow: 'hidden',
+                          position: 'relative',
                           display: 'flex',
-                          flexDirection: 'column',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          cursor: 'pointer',
-                          gap: '6px',
-                          margin: 0,
-                        }}>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, idx)}
-                            style={{ display: 'none' }}
-                          />
-                          <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '24px' }}>add_a_photo</span>
-                          <span style={{ fontSize: '10px', color: 'var(--text-dim)', fontWeight: '600', fontFamily: 'Geist, sans-serif' }}>UPLOAD</span>
-                        </label>
-                      )}
-                    </div>
-                  ))}
+                          cursor: isUploading ? 'default' : 'pointer',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        {isUploading && (
+                          <div style={{
+                            position: 'absolute', inset: 0, zIndex: 20,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(0,0,0,0.5)', borderRadius: '20px',
+                          }}>
+                            <div style={{
+                              width: '32px', height: '32px', borderRadius: '50%',
+                              border: '2px solid rgba(255,255,255,0.15)',
+                              borderTopColor: '#f97316',
+                              animation: 'spin 0.8s linear infinite',
+                            }} />
+                          </div>
+                        )}
+
+                        {photo && !isUploading ? (
+                          <>
+                            <img
+                              src={photo}
+                              alt={`Upload ${idx + 1}`}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div style={{
+                              position: 'absolute', bottom: 0, left: 0, right: 0,
+                              background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+                              padding: '24px 12px 8px',
+                              display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
+                            }}>
+                              <span style={{
+                                fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.5)',
+                                letterSpacing: '0.5px', fontFamily: 'Geist, sans-serif',
+                              }}>
+                                {idx === 0 ? 'PRIMARY' : `${idx + 1}`}
+                              </span>
+                            </div>
+                            <button
+                              onClick={(e) => handleClearImage(e, idx)}
+                              style={{
+                                position: 'absolute', top: '8px', right: '8px', zIndex: 10,
+                                width: '28px', height: '28px', borderRadius: '50%',
+                                backgroundColor: 'rgba(0,0,0,0.55)',
+                                backdropFilter: 'blur(8px)',
+                                border: '0.5px solid rgba(255,255,255,0.1)',
+                                color: 'rgba(255,255,255,0.8)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '16px', cursor: 'pointer', padding: 0, lineHeight: 1,
+                              }}
+                            >
+                              ×
+                            </button>
+                          </>
+                        ) : !isUploading && (
+                          <label style={{
+                            width: '100%', height: '100%',
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', gap: '10px', margin: 0,
+                          }}>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(e, idx)}
+                              style={{ display: 'none' }}
+                            />
+                            <span className="material-symbols-outlined" style={{
+                              fontSize: '36px',
+                              color: 'rgba(255,255,255,0.15)',
+                              fontVariationSettings: "'FILL' 0",
+                            }}>
+                              add_photo_alternate
+                            </span>
+                            <span style={{
+                              fontSize: '11px', color: 'rgba(255,255,255,0.25)',
+                              fontWeight: '600', fontFamily: 'Geist, sans-serif',
+                            }}>
+                              TAP TO ADD
+                            </span>
+                          </label>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}
