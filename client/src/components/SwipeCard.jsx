@@ -12,6 +12,15 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
 
   const rotate = useTransform(x, [-200, 200], [-8, 8]);
 
+  const likeScale = useTransform(x, [0, 100], [0, 1.2]);
+  const likeOpacity = useTransform(x, [0, 60], [0, 1]);
+  const likeRotate = useTransform(x, [0, 100], [-15, 0]);
+  const nopeScale = useTransform(x, [-100, 0], [1.2, 0]);
+  const nopeOpacity = useTransform(x, [-60, 0], [1, 0]);
+  const nopeRotate = useTransform(x, [-100, 0], [15, 0]);
+  const rightTint = useTransform(x, [0, 120], [0, 0.18]);
+  const leftTint = useTransform(x, [-120, 0], [0.18, 0]);
+
   const handlePointerDown = useCallback((content) => {
     longPressTimer.current = setTimeout(() => {
       setPreview(content);
@@ -458,6 +467,89 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
 
         </div>
       </div>
+
+      {/* Swipe Indicators — only when dragging */}
+      {dragEnabled && (
+        <>
+          {/* LIKE — right swipe */}
+          <motion.div style={{
+            position: 'absolute',
+            bottom: '30%',
+            right: '20px',
+            zIndex: 50,
+            scale: likeScale,
+            opacity: likeOpacity,
+            rotate: likeRotate,
+            pointerEvents: 'none',
+          }}>
+            <div style={{
+              padding: '8px 20px',
+              borderRadius: '12px',
+              border: '3px solid #f97316',
+              color: '#f97316',
+              fontSize: '32px',
+              fontWeight: '900',
+              fontFamily: 'Geist, sans-serif',
+              letterSpacing: '2px',
+              textTransform: 'uppercase',
+              textShadow: '0 0 20px rgba(249,115,22,0.6)',
+              boxShadow: '0 0 30px rgba(249,115,22,0.25)',
+              transform: 'rotate(-15deg)',
+            }}>
+              LIKE
+            </div>
+          </motion.div>
+
+          {/* NOPE — left swipe */}
+          <motion.div style={{
+            position: 'absolute',
+            bottom: '30%',
+            left: '20px',
+            zIndex: 50,
+            scale: nopeScale,
+            opacity: nopeOpacity,
+            rotate: nopeRotate,
+            pointerEvents: 'none',
+          }}>
+            <div style={{
+              padding: '8px 20px',
+              borderRadius: '12px',
+              border: '3px solid rgba(255,255,255,0.7)',
+              color: 'rgba(255,255,255,0.7)',
+              fontSize: '32px',
+              fontWeight: '900',
+              fontFamily: 'Geist, sans-serif',
+              letterSpacing: '2px',
+              textTransform: 'uppercase',
+              transform: 'rotate(15deg)',
+            }}>
+              NOPE
+            </div>
+          </motion.div>
+
+          {/* Orange edge tint — right swipe */}
+          <motion.div style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 30,
+            background: 'linear-gradient(to left, rgba(249,115,22,0.5) 0%, transparent 50%)',
+            opacity: rightTint,
+            borderRadius: '28px 28px 0 0',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Dark edge tint — left swipe */}
+          <motion.div style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 30,
+            background: 'linear-gradient(to right, rgba(255,255,255,0.15) 0%, transparent 50%)',
+            opacity: leftTint,
+            borderRadius: '28px 28px 0 0',
+            pointerEvents: 'none',
+          }} />
+        </>
+      )}
 
       {/* Preview Overlay — persists until tap or drag dismiss */}
       <AnimatePresence>
