@@ -191,7 +191,9 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               left: 0,
               right: 0,
               zIndex: 2,
-              background: 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
+              background: heroTextColor === '#000000'
+                ? 'linear-gradient(to top, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0) 100%)'
+                : 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
               height: '100px',
               display: 'flex',
               flexDirection: 'column',
