@@ -32,13 +32,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
     setPreview(null);
   }, []);
 
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 20;
-    setShowBottomGrad(atBottom);
-  }, []);
-
   const previewHandlers = dragEnabled ? (content) => ({
     onPointerDown: () => handlePointerDown(content),
     onPointerUp: handlePointerUp,
@@ -121,8 +114,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
         {dragEnabled && <></>}
 
         <div
-          ref={scrollRef}
-          onScroll={handleScroll}
           style={{
             flex: 1,
             position: 'relative',
@@ -447,19 +438,17 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
 
         </div>
 
-        {/* Bottom gradient — visible only when scrolled to bottom */}
-        {showBottomGrad && (
-          <div style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '200px',
-            background: 'linear-gradient(to top, #000000 0%, #000000 25%, transparent 100%)',
-            pointerEvents: 'none',
-            zIndex: 5,
-          }} />
-        )}
+        {/* Bottom gradient — always visible */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '200px',
+          background: 'linear-gradient(to top, #000000 0%, #000000 25%, transparent 100%)',
+          pointerEvents: 'none',
+          zIndex: 5,
+        }} />
       </div>
 
       {/* Preview Overlay — persists until tap or drag dismiss */}
