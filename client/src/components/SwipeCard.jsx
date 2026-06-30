@@ -386,10 +386,19 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
             {/* Last image */}
             {extraImgs[2] && (
               <div
-                className="bento-block" style={{ height: '220px', padding: 0, borderRadius: '20px', overflow: 'hidden', cursor: 'pointer', WebkitTouchCallout: 'none' }}
+                className="bento-block" style={{ height: '220px', padding: 0, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
                 {...previewHandlers({ type: 'image', src: extraImgs[2] })}
               >
                 <img src={extraImgs[2]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: '60%',
+                  background: 'linear-gradient(to top, #000000 0%, #000000 30%, rgba(0,0,0,0) 100%)',
+                  pointerEvents: 'none',
+                }} />
               </div>
             )}
 
