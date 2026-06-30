@@ -176,7 +176,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {/* Line 1: Name, age */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                 <span style={{
-                  fontSize: '27px', fontWeight: '700', color: '#ffffff',
+                  fontSize: '50px', fontWeight: '700', color: '#ffffff',
                   letterSpacing: '-0.02em', lineHeight: 1.15,
                   fontFamily: 'Geist, sans-serif',
                 }}>
