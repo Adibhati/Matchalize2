@@ -222,7 +222,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {(user.branch || user.year) && (
                 <div style={{ marginTop: '2px' }}>
                   <span style={{
-                    fontSize: '13px', fontWeight: '500',                     color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)',
+                    fontSize: '14px', fontWeight: '500', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)',
                     letterSpacing: '0.3px', lineHeight: 1.3,
                     fontFamily: 'Inter, sans-serif',
                   }}>
@@ -244,7 +244,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                   paddingBottom: '2px',
                 }}>
                   <span style={{
-                    fontSize: '13px', fontWeight: '400',
+                    fontSize: '14px', fontWeight: '400',
                     color: '#ffffff',
                     fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
                     lineHeight: 1.45,
