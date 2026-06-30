@@ -29,6 +29,11 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
     setPreview(null);
   }, []);
 
+  const previewHandlers = dragEnabled ? (content) => ({
+    onPointerDown: () => handlePointerDown(content),
+    onPointerUp: handlePointerUp,
+  }) : () => ({});
+
   if (!user) return null;
 
   const mainImg = user.photos && user.photos.length > 0 ? user.photos[0] : null;
@@ -308,8 +313,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               <div className="bento-row" style={{ height: '220px' }}>
                   <div
                     className="bento-block glass-bento" style={{ flex: 1.3, justifyContent: 'center', background: 'linear-gradient(135deg, rgba(249,115,22,0.06) 0%, rgba(234,88,12,0.04) 100%)', borderColor: 'rgba(249,115,22,0.15)', position: 'relative', overflow: 'hidden', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none' }}
-                    onPointerDown={() => handlePointerDown({ type: 'prompt', question: prompts[0].question, answer: prompts[0].answer })}
-                    onPointerUp={handlePointerUp}
+                    {...previewHandlers({ type: 'prompt', question: prompts[0].question, answer: prompts[0].answer })}
                   >
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
                   <div className="bento-header" style={{ color: '#fb923c', position: 'relative', zIndex: 1 }}>
@@ -323,8 +327,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 {extraImgs[0] && (
                   <div
                     style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
-                    onPointerDown={() => handlePointerDown({ type: 'image', src: extraImgs[0] })}
-                    onPointerUp={handlePointerUp}
+                    {...previewHandlers({ type: 'image', src: extraImgs[0] })}
 
                   >
                     <img src={extraImgs[0]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
@@ -339,8 +342,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 {extraImgs[1] && (
                   <div
                     style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
-                    onPointerDown={() => handlePointerDown({ type: 'image', src: extraImgs[1] })}
-                    onPointerUp={handlePointerUp}
+                    {...previewHandlers({ type: 'image', src: extraImgs[1] })}
 
                   >
                     <img src={extraImgs[1]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
@@ -349,8 +351,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 {prompts[1] && (
                   <div
                     className="bento-block glass-bento" style={{ flex: 1.3, justifyContent: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none' }}
-                    onPointerDown={() => handlePointerDown({ type: 'prompt', question: prompts[1].question, answer: prompts[1].answer })}
-                    onPointerUp={handlePointerUp}
+                    {...previewHandlers({ type: 'prompt', question: prompts[1].question, answer: prompts[1].answer })}
 
                   >
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
@@ -372,8 +373,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 {prompts[2] && (
                   <div
                     className="bento-block glass-bento" style={{ flex: 1.3, justifyContent: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none' }}
-                    onPointerDown={() => handlePointerDown({ type: 'prompt', question: prompts[2].question, answer: prompts[2].answer })}
-                    onPointerUp={handlePointerUp}
+                    {...previewHandlers({ type: 'prompt', question: prompts[2].question, answer: prompts[2].answer })}
 
                   >
                     <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
@@ -389,8 +389,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 {extraImgs[2] && (
                   <div
                     style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
-                    onPointerDown={() => handlePointerDown({ type: 'image', src: extraImgs[2] })}
-                    onPointerUp={handlePointerUp}
+                    {...previewHandlers({ type: 'image', src: extraImgs[2] })}
 
                   >
                     <img src={extraImgs[2]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
@@ -404,8 +403,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               <div className="bento-row" style={{ height: '160px' }}>
                 <div
                   className="bento-block glass-bento" style={{ width: '100%', justifyContent: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none' }}
-                  onPointerDown={() => handlePointerDown({ type: 'prompt', question: prompts[3].question, answer: prompts[3].answer })}
-                  onPointerUp={handlePointerUp}
+                  {...previewHandlers({ type: 'prompt', question: prompts[3].question, answer: prompts[3].answer })}
                 >
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
                   <div className="bento-header" style={{ color: 'var(--primary)', position: 'relative', zIndex: 1 }}>
@@ -424,8 +422,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               <div className="bento-row" style={{ height: '160px' }}>
                 <div
                   className="bento-block glass-bento" style={{ width: '100%', justifyContent: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none' }}
-                  onPointerDown={() => handlePointerDown({ type: 'prompt', question: prompts[4].question, answer: prompts[4].answer })}
-                  onPointerUp={handlePointerUp}
+                  {...previewHandlers({ type: 'prompt', question: prompts[4].question, answer: prompts[4].answer })}
                 >
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
                   <div className="bento-header" style={{ color: 'var(--primary)', position: 'relative', zIndex: 1 }}>
