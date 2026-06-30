@@ -192,8 +192,10 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               right: 0,
               zIndex: 2,
               background: heroTextColor === '#000000'
-                ? 'linear-gradient(to top, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0) 100%)'
-                : 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
+                ? 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.6) 35%, rgba(255,255,255,0) 100%)'
+                : 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 35%, rgba(0,0,0,0) 100%)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               height: '100px',
               display: 'flex',
               flexDirection: 'column',
@@ -247,7 +249,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 }}>
                   <span style={{
                     fontSize: '14px', fontWeight: '400',
-                    color: '#ffffff',
+                    color: heroTextColor,
                     fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
                     lineHeight: 1.45,
                   }}>
