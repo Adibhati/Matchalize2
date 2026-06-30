@@ -367,34 +367,32 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               </div>
             )}
 
-            {/* Prompt 3 + Image 3 */}
-            {(prompts[2] || extraImgs[2]) && (
-              <div className="bento-row" style={{ height: '220px' }}>
-                {prompts[2] && (
-                  <div
-                    className="bento-block glass-bento" style={{ flex: 1.3, justifyContent: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none' }}
-                    {...previewHandlers({ type: 'prompt', question: prompts[2].question, answer: prompts[2].answer })}
-
-                  >
-                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
-                    <div className="bento-header" style={{ color: '#fb923c', position: 'relative', zIndex: 1 }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '14.4px', fontVariationSettings: "'FILL' 1" }}>chat_bubble</span>
-                      {prompts[2].question}
-                    </div>
-                    <div style={{ fontSize: '16.5px', color: '#fff', fontStyle: 'italic', fontWeight: '500', lineHeight: 1.4, marginTop: '8px', fontFamily: 'Inter, sans-serif', textShadow: '0 0 12px rgba(249,115,22,0.25)', position: 'relative', zIndex: 1 }}>
-                      {prompts[2].answer}
-                    </div>
+            {/* Prompt 3 — full width */}
+            {prompts[2] && (
+              <div style={{ margin: '0 -12px', height: '220px' }}>
+                <div
+                  className="bento-block glass-bento" style={{ width: '100%', height: '100%', borderRadius: 0, borderLeft: 'none', borderRight: 'none', justifyContent: 'center', position: 'relative', overflow: 'hidden', cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none' }}
+                  {...previewHandlers({ type: 'prompt', question: prompts[2].question, answer: prompts[2].answer })}
+                >
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.015)', pointerEvents: 'none' }} />
+                  <div className="bento-header" style={{ color: '#fb923c', position: 'relative', zIndex: 1 }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '14.4px', fontVariationSettings: "'FILL' 1" }}>chat_bubble</span>
+                    {prompts[2].question}
                   </div>
-                )}
-                {extraImgs[2] && (
-                  <div
-                    style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
-                    {...previewHandlers({ type: 'image', src: extraImgs[2] })}
-
-                  >
-                    <img src={extraImgs[2]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
+                  <div style={{ fontSize: '16.5px', color: '#fff', fontStyle: 'italic', fontWeight: '500', lineHeight: 1.4, marginTop: '8px', fontFamily: 'Inter, sans-serif', textShadow: '0 0 12px rgba(249,115,22,0.25)', position: 'relative', zIndex: 1 }}>
+                    {prompts[2].answer}
                   </div>
-                )}
+                </div>
+              </div>
+            )}
+
+            {/* Last image — full width edge to edge */}
+            {extraImgs[2] && (
+              <div
+                style={{ margin: '0 -12px', height: '280px', borderRadius: 0, overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
+                {...previewHandlers({ type: 'image', src: extraImgs[2] })}
+              >
+                <img src={extraImgs[2]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
               </div>
             )}
 
