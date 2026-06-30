@@ -37,9 +37,7 @@ const Onboarding = () => {
     year: '',
     hostel: '',
     bio: '',
-    prompts: [
-      ...PROMPT_BANK.sort(() => 0.5 - Math.random()).slice(0, 5).map((q) => ({ question: q, answer: '' })),
-    ],
+    prompts: [],
     photos: ['', '', '', ''], // inputs for URLs
     intent: [],
     interestedIn: [], // array of genders
@@ -618,54 +616,100 @@ const Onboarding = () => {
 
             {/* STEP 5: Prompts */}
             {step === 5 && (
-              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
-                <h2 style={stepTitleStyle}>Answer prompts</h2>
-                <p style={stepSubtitleStyle}>Write interesting answers to stand out.</p>
+              <motion.div style={{ flex: 1, display: 'flex', flexDirection: 'column' }} initial="enter" animate="center" variants={slideVariants}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                  <h2 style={stepTitleStyle}>Your prompts</h2>
+                  <span style={{
+                    fontSize: '12px', fontWeight: '700', color: 'var(--primary)',
+                    fontFamily: 'Geist, sans-serif',
+                  }}>
+                    {formData.prompts.filter(p => p.answer.trim()).length}/5
+                  </span>
+                </div>
+                <p style={stepSubtitleStyle}>Tap prompts to select them, then write your answer.</p>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {formData.prompts.map((p, idx) => (
-                    <div key={idx} style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.01)',
-                      border: '0.5px solid rgba(255, 255, 255, 0.05)',
-                      borderRadius: '24px',
-                      padding: '20px',
-                    }}>
-                      <label style={{
-                        fontSize: '11px',
-                        fontWeight: '700',
-                        color: idx === 0 ? 'var(--primary)' : idx === 1 ? 'var(--rose)' : idx === 2 ? 'var(--primary)' : idx === 3 ? 'var(--rose)' : 'var(--text-dim)',
-                        letterSpacing: '1px',
-                        marginBottom: '10px',
-                        display: 'block',
-                        fontFamily: 'Geist, sans-serif',
-                      }}>
-                        PROMPT QUESTION {idx + 1}
-                      </label>
-                      <div style={{ fontSize: '15px', color: '#ffffff', fontWeight: '600', marginBottom: '14px', fontFamily: 'Geist, sans-serif' }}>
-                        {p.question}
-                      </div>
-                      <textarea
-                        className="input-underline"
-                        placeholder="Write your answer here..."
-                        value={p.answer}
-                        onChange={(e) => updatePrompt(idx, 'answer', e.target.value)}
-                        rows={3}
-                        style={{
-                          fontSize: '16px',
-                          fontFamily: 'Inter, sans-serif',
-                          width: '100%',
-                          resize: 'vertical',
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          borderBottom: '0.5px solid rgba(255,255,255,0.1)',
-                          color: '#ffffff',
-                          outline: 'none',
-                          padding: '8px 0',
-                          lineHeight: '1.5',
-                        }}
-                      />
-                    </div>
-                  ))}
+                <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }} className="interests-scroll">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', paddingBottom: '8px' }}>
+                    {PROMPT_BANK.map((question, idx) => {
+                      const selected = formData.prompts.find(p => p.question === question);
+                      const selectedIdx = formData.prompts.findIndex(p => p.question === question);
+                      const isFull = formData.prompts.filter(p => p.answer.trim()).length >= 5;
+                      return (
+                        <div key={idx} style={{
+                          borderRadius: '20px',
+                          backgroundColor: selected ? 'rgba(249,115,22,0.08)' : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${selected ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.06)'}`,
+                          overflow: 'hidden',
+                          transition: 'all 0.2s ease',
+                          opacity: (!selected && isFull) ? 0.3 : 1,
+                          pointerEvents: (!selected && isFull) ? 'none' : 'auto',
+                        }}>
+                          <div
+                            onClick={() => {
+                              if (selected) {
+                                const updated = formData.prompts.filter(p => p.question !== question);
+                                updateField('prompts', updated);
+                              } else {
+                                updateField('prompts', [...formData.prompts, { question, answer: '' }]);
+                              }
+                            }}
+                            style={{
+                              padding: '14px 16px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                            }}
+                          >
+                            <div style={{
+                              width: '22px', height: '22px', borderRadius: '50%',
+                              border: `2px solid ${selected ? 'var(--primary)' : 'rgba(255,255,255,0.15)'}`,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              flexShrink: 0,
+                              transition: 'all 0.2s ease',
+                              backgroundColor: selected ? 'var(--primary)' : 'transparent',
+                            }}>
+                              {selected && (
+                                <span style={{ fontSize: '12px', color: '#fff', fontWeight: '700', lineHeight: 1 }}>✓</span>
+                              )}
+                            </div>
+                            <span style={{
+                              fontSize: '14px', fontWeight: '500',
+                              color: selected ? '#ffffff' : 'rgba(255,255,255,0.6)',
+                              fontFamily: 'Inter, sans-serif',
+                              lineHeight: 1.4,
+                            }}>
+                              {question}
+                            </span>
+                          </div>
+
+                          {selected && (
+                            <div style={{ padding: '0 16px 14px 50px' }}>
+                              <textarea
+                                placeholder="Write your answer..."
+                                value={selected.answer}
+                                onChange={(e) => updatePrompt(selectedIdx, 'answer', e.target.value)}
+                                rows={2}
+                                style={{
+                                  width: '100%',
+                                  backgroundColor: 'rgba(255,255,255,0.03)',
+                                  border: '0.5px solid rgba(255,255,255,0.08)',
+                                  borderRadius: '14px',
+                                  color: '#ffffff',
+                                  padding: '12px 14px',
+                                  fontSize: '14px',
+                                  fontFamily: 'Inter, sans-serif',
+                                  outline: 'none',
+                                  resize: 'none',
+                                  lineHeight: 1.5,
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </motion.div>
             )}
