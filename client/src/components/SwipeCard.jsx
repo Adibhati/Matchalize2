@@ -119,7 +119,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
             style={{
               position: 'relative',
               width: '100%',
-              minHeight: 'calc(100% - 60px)',
+              minHeight: '100%',
               backgroundImage: mainImg ? `url(${mainImg})` : 'none',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
@@ -155,7 +155,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               right: 0,
               zIndex: 2,
               background: 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
-              padding: '60px 20px calc(60px + 15px) 20px',
+              padding: '120px 20px 12px 20px',
               pointerEvents: 'none',
             }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
