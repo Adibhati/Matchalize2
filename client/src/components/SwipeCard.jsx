@@ -147,7 +147,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               </div>
             )}
 
-            {/* Ultra-minimal overlay: name+age, branch·year, bio */}
+            {/* Bottom overlay: name+age, branch·year, bio */}
             <div style={{
               position: 'absolute',
               bottom: 0,
@@ -155,44 +155,57 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               right: 0,
               zIndex: 2,
               background: 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
-              padding: '120px 20px 12px 20px',
+              padding: '120px 20px 14px 20px',
               pointerEvents: 'none',
             }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              {/* Line 1: Name, age */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                 <span style={{
-                  fontSize: '24px', fontWeight: '700', color: '#ffffff',
-                  letterSpacing: '-0.02em', lineHeight: 1.2,
+                  fontSize: '26px', fontWeight: '700', color: '#ffffff',
+                  letterSpacing: '-0.02em', lineHeight: 1.15,
                   fontFamily: 'Geist, sans-serif',
                 }}>
                   {user.name}
                 </span>
                 {user.age && (
                   <span style={{
-                    fontSize: '15px', fontWeight: '400', color: 'rgba(255,255,255,0.75)',
-                    lineHeight: 1.2,
+                    fontSize: '18px', fontWeight: '400', color: 'rgba(255,255,255,0.55)',
+                    lineHeight: 1.15,
                   }}>
                     {user.age}
                   </span>
                 )}
-                {(user.branch || user.year) && (
-                  <span style={{
-                    fontSize: '12px', fontWeight: '400', color: 'rgba(255,255,255,0.45)',
-                    lineHeight: 1.2, marginLeft: '4px',
-                  }}>
-                    <span>{user.branch}</span>
-                    {user.branch && user.year && <span> · </span>}
-                    <span>{user.year}</span>
-                  </span>
-                )}
               </div>
 
+              {/* Line 2: Branch · Year */}
+              {(user.branch || user.year) && (
+                <div style={{ marginTop: '2px' }}>
+                  <span style={{
+                    fontSize: '13px', fontWeight: '500', color: 'rgba(255,255,255,0.5)',
+                    letterSpacing: '0.3px', lineHeight: 1.3,
+                    fontFamily: 'Inter, sans-serif',
+                  }}>
+                    {user.branch}
+                    {user.branch && user.year && <span style={{ margin: '0 5px', color: 'rgba(255,255,255,0.25)' }}>·</span>}
+                    {user.year}
+                  </span>
+                </div>
+              )}
+
+              {/* Line 3: Bio */}
               {user.bio && (
-                <div style={{ marginTop: '6px', borderLeft: '1.5px solid #f97316', paddingLeft: '10px' }}>
+                <div style={{
+                  marginTop: '8px',
+                  borderLeft: '2px solid #f97316',
+                  paddingLeft: '10px',
+                  paddingTop: '2px',
+                  paddingBottom: '2px',
+                }}>
                   <span style={{
                     fontSize: '13px', fontWeight: '400',
-                    color: 'rgba(255,255,255,0.6)',
+                    color: 'rgba(255,255,255,0.55)',
                     fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
-                    lineHeight: 1.4,
+                    lineHeight: 1.45,
                   }}>
                     {user.bio}
                   </span>
