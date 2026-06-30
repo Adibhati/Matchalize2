@@ -295,12 +295,12 @@ const Onboarding = () => {
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   <div>
-                    <label htmlFor="name" style={labelStyle}>FIRST NAME</label>
+                    <label htmlFor="name" style={labelStyle}>YOUR NAME</label>
                     <input
                       id="name"
                       type="text"
                       className="input-underline"
-                      placeholder="Aditya"
+                      placeholder=""
                       value={formData.name}
                       onChange={(e) => updateField('name', e.target.value)}
                     />
@@ -311,6 +311,7 @@ const Onboarding = () => {
                       id="dob"
                       type="date"
                       className="input-underline"
+                      style={{ textAlign: 'left' }}
                       max={new Date().toISOString().split('T')[0]}
                       value={formData.dob || ''}
                       onChange={(e) => {
@@ -358,16 +359,18 @@ const Onboarding = () => {
                         onClick={() => updateField('gender', g)}
                         style={{
                           justifyContent: 'flex-start',
-                          backgroundColor: active ? 'rgba(249,115,22,0.06)' : 'rgba(255,255,255,0.02)',
-                          border: `0.5px solid ${active ? 'var(--primary)' : 'rgba(255,255,255,0.06)'}`,
+                          backgroundColor: active ? 'rgba(249,115,22,0.15)' : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${active ? 'rgba(249,115,22,0.5)' : 'rgba(255,255,255,0.06)'}`,
                           color: active ? '#ffffff' : 'rgba(255,255,255,0.7)',
                           borderRadius: '16px',
                           padding: '12px 16px',
                           fontSize: '14px',
                           fontWeight: '600',
                           fontFamily: 'Geist, sans-serif',
+                          boxShadow: active ? '0 0 30px rgba(249,115,22,0.12)' : 'none',
                         }}
                       >
+                        {active && <span style={{ fontSize: '14px', marginRight: '4px' }}>✓</span>}
                         {g}
                       </button>
                     );
@@ -395,14 +398,15 @@ const Onboarding = () => {
                             borderRadius: '99px',
                             fontSize: '12px',
                             fontWeight: '600',
-                            backgroundColor: active ? 'rgba(249,115,22,0.06)' : 'rgba(255,255,255,0.02)',
-                            border: `0.5px solid ${active ? 'var(--primary)' : 'rgba(255,255,255,0.06)'}`,
+                            backgroundColor: active ? 'rgba(249,115,22,0.15)' : 'rgba(255,255,255,0.02)',
+                            border: `1px solid ${active ? 'rgba(249,115,22,0.5)' : 'rgba(255,255,255,0.06)'}`,
                             color: active ? '#ffffff' : 'rgba(255,255,255,0.7)',
                             cursor: 'pointer',
                             whiteSpace: 'nowrap',
                             transition: 'all 0.15s ease',
                             flexShrink: 0,
                             fontFamily: 'Geist, sans-serif',
+                            boxShadow: active ? '0 0 20px rgba(249,115,22,0.1)' : 'none',
                           }}
                         >
                           {p}
@@ -652,12 +656,13 @@ const Onboarding = () => {
                               borderRadius: '16px',
                               fontSize: '13px',
                               fontWeight: '700',
-                              backgroundColor: active ? 'rgba(249,115,22,0.06)' : 'rgba(255,255,255,0.02)',
-                              border: `0.5px solid ${active ? 'var(--primary)' : 'rgba(255,255,255,0.06)'}`,
+                              backgroundColor: active ? 'rgba(249,115,22,0.15)' : 'rgba(255,255,255,0.02)',
+                              border: `1px solid ${active ? 'rgba(249,115,22,0.5)' : 'rgba(255,255,255,0.06)'}`,
                               color: active ? '#ffffff' : 'rgba(255,255,255,0.7)',
                               cursor: 'pointer',
                               transition: 'all 0.15s ease',
                               fontFamily: 'Geist, sans-serif',
+                              boxShadow: active ? '0 0 30px rgba(249,115,22,0.12)' : 'none',
                             }}
                           >
                             {intent === 'Dating' ? '❤️ Dating' : intent === 'Friends' ? '👋 Friends' : '📚 Study'}
@@ -679,8 +684,8 @@ const Onboarding = () => {
                             onClick={() => handleGenderInterestToggle(g)}
                             style={{
                               justifyContent: 'flex-start',
-                              backgroundColor: active ? 'rgba(249,115,22,0.06)' : 'rgba(255,255,255,0.02)',
-                              border: `0.5px solid ${active ? 'var(--primary)' : 'rgba(255,255,255,0.06)'}`,
+                              backgroundColor: active ? 'rgba(249,115,22,0.15)' : 'rgba(255,255,255,0.02)',
+                              border: `1px solid ${active ? 'rgba(249,115,22,0.5)' : 'rgba(255,255,255,0.06)'}`,
                               color: active ? '#ffffff' : 'rgba(255,255,255,0.7)',
                               borderRadius: '16px',
                               padding: '12px 16px',
@@ -690,6 +695,7 @@ const Onboarding = () => {
                               display: 'flex',
                               alignItems: 'center',
                               gap: '6px',
+                              boxShadow: active ? '0 0 30px rgba(249,115,22,0.12)' : 'none',
                             }}
                           >
                             {active ? '✓' : ''} {g}
@@ -740,8 +746,8 @@ const Onboarding = () => {
                           borderRadius: '99px',
                           fontSize: '14px',
                           fontWeight: '600',
-                          backgroundColor: active ? 'rgba(249,115,22,0.08)' : 'rgba(255,255,255,0.02)',
-                          border: `0.5px solid ${active ? 'var(--primary)' : 'rgba(255,255,255,0.06)'}`,
+                          backgroundColor: active ? 'rgba(249,115,22,0.15)' : 'rgba(255,255,255,0.02)',
+                          border: `1px solid ${active ? 'rgba(249,115,22,0.5)' : 'rgba(255,255,255,0.06)'}`,
                           color: active ? '#ffffff' : 'rgba(255,255,255,0.7)',
                           cursor: 'pointer',
                           transition: 'all 0.15s ease',
@@ -749,12 +755,13 @@ const Onboarding = () => {
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '8px',
+                          boxShadow: active ? '0 0 30px rgba(249,115,22,0.12)' : 'none',
                         }}
                       >
                         <span className="material-symbols-outlined" style={{
                           fontSize: '18px',
                           fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0",
-                          color: active ? '#f97316' : 'rgba(255,255,255,0.5)',
+                          color: active ? '#ffffff' : 'rgba(255,255,255,0.5)',
                         }}>
                           {icon}
                         </span>
