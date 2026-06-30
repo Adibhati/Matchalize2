@@ -244,7 +244,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
           </div>
 
           {/* Bento Grid */}
-          <div className="bento-grid" style={{ paddingBottom: '80px' }}>
+          <div className="bento-grid">
 
             {/* Vitals */}
             {vitals.length > 0 && (
