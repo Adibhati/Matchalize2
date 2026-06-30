@@ -136,7 +136,7 @@ const Profile = () => {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <h1 style={{
             fontFamily: 'Outfit, sans-serif',
-            fontSize: '34px',
+            fontSize: '36px',
             fontWeight: '800',
             color: 'var(--text)',
             letterSpacing: '-0.5px',
@@ -145,7 +145,7 @@ const Profile = () => {
             lineHeight: '1',
           }}>profile</h1>
           <div style={{
-            width: '108px',
+            width: '55px',
             height: '4px',
             borderRadius: '2px',
             marginTop: '4px',

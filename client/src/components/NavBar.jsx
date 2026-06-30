@@ -21,7 +21,7 @@ const ProfileIcon = ({ active }) => (
   </svg>
 );
 
-const NavBar = () => {
+const NavBar = React.memo(() => {
   return (
     <nav className="glass-panel" style={{
       height: '60px',
@@ -77,20 +77,9 @@ const NavBar = () => {
         )}
       </NavLink>
 
-      <style>{`
-        .nav-item {
-          color: var(--text-dim);
-          text-decoration: none;
-          transition: all 0.2s ease;
-        }
-        .nav-item.active {
-          color: var(--primary) !important;
-          transform: translateY(-2px);
-        }
-      `}</style>
     </nav>
   );
-};
+});
 
 const navLinkStyle = {
   display: 'flex',

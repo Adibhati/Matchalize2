@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../utils/api';
@@ -25,6 +25,7 @@ const Onboarding = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [uploadingIdx, setUploadingIdx] = useState(null);
+  const [direction, setDirection] = useState(1);
 
     // Form Fields State
   const [formData, setFormData] = useState({
@@ -119,6 +120,7 @@ const Onboarding = () => {
 
   const nextStep = () => {
     setError('');
+    setDirection(1);
     // Step validation checks
     if (step === 1 && (!formData.name || !formData.age)) {
       setError('Please enter your name and age');
@@ -145,10 +147,6 @@ const Onboarding = () => {
     }
     if (step === 5) {
       const activePrompts = formData.prompts.filter(p => p.answer.trim() !== '');
-      if (activePrompts.length === 0) {
-        setError('Please answer at least one prompt question');
-        return;
-      }
       if (activePrompts.length < 3) {
         setError('Please answer at least 3 prompt questions');
         return;
@@ -167,7 +165,9 @@ const Onboarding = () => {
   };
 
   const prevStep = () => {
+    if (loading) return;
     setError('');
+    setDirection(-1);
     if (step > 1) {
       setStep((prev) => prev - 1);
     }
@@ -267,31 +267,42 @@ const Onboarding = () => {
             ))}
           </div>
 
+          <AnimatePresence>
           {error && (
-            <div style={{
-              padding: '12px 16px',
-              borderRadius: '16px',
-              backgroundColor: 'rgba(220, 38, 38, 0.1)',
-              border: '0.5px solid rgba(220, 38, 38, 0.2)',
-              color: 'var(--rose)',
-              fontSize: '13px',
-              fontWeight: '500',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}>
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: -8, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -8, height: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                padding: '12px 16px',
+                borderRadius: '16px',
+                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                border: '0.5px solid rgba(220, 38, 38, 0.2)',
+                color: 'var(--rose)',
+                fontSize: '13px',
+                fontWeight: '500',
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                overflow: 'hidden',
+              }}
+            >
               <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>error</span>
               {error}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
 
           {/* Form Scroll Viewport */}
           <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column' }} className="step-scroll">
+          <AnimatePresence mode="wait" custom={direction}>
             
             {/* STEP 1: Basic Info */}
             {step === 1 && (
-              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div key="step-1" custom={direction} style={{ flex: 1 }} initial="enter" animate="center" exit="exit" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Let's build your profile</h2>
                 <p style={stepSubtitleStyle}>How should classmates address you?</p>
 
@@ -347,7 +358,7 @@ const Onboarding = () => {
 
             {/* STEP 2: Gender & Pronouns */}
             {step === 2 && (
-              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div key="step-2" custom={direction} style={{ flex: 1 }} initial="enter" animate="center" exit="exit" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Gender Identity</h2>
                 <p style={stepSubtitleStyle}>Select the option that represents you best.</p>
 
@@ -433,7 +444,7 @@ const Onboarding = () => {
 
             {/* STEP 3: Campus Details */}
             {step === 3 && (
-              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div key="step-3" custom={direction} style={{ flex: 1 }} initial="enter" animate="center" exit="exit" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Campus Details</h2>
                 <p style={stepSubtitleStyle}>Help us find classmates near you.</p>
 
@@ -497,7 +508,7 @@ const Onboarding = () => {
 
             {/* STEP 4: Photos */}
             {step === 4 && (
-              <motion.div style={{ flex: 1, display: 'flex', flexDirection: 'column' }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div key="step-4" custom={direction} style={{ flex: 1, display: 'flex', flexDirection: 'column' }} initial="enter" animate="center" exit="exit" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Add your photos</h2>
                 <p style={stepSubtitleStyle}>Upload up to 4 photos to show your campus style.</p>
 
@@ -616,7 +627,7 @@ const Onboarding = () => {
 
             {/* STEP 5: Prompts */}
             {step === 5 && (
-              <motion.div style={{ flex: 1, display: 'flex', flexDirection: 'column' }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div key="step-5" custom={direction} style={{ flex: 1, display: 'flex', flexDirection: 'column' }} initial="enter" animate="center" exit="exit" variants={slideVariants}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
                   <h2 style={stepTitleStyle}>Your prompts</h2>
                   <span style={{
@@ -716,7 +727,7 @@ const Onboarding = () => {
 
             {/* STEP 6: Intent & Bio */}
             {step === 6 && (
-              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div key="step-6" custom={direction} style={{ flex: 1 }} initial="enter" animate="center" exit="exit" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Interests & Intent</h2>
                 <p style={stepSubtitleStyle}>What are you looking for on campus?</p>
 
@@ -803,7 +814,7 @@ const Onboarding = () => {
 
             {/* STEP 7: Interests */}
             {step === 7 && (
-              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
+              <motion.div key="step-7" custom={direction} style={{ flex: 1 }} initial="enter" animate="center" exit="exit" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Choose your interests</h2>
                 <p style={stepSubtitleStyle}>Select up to {APP_CONSTANTS.MAX_INTERESTS} topics that you enjoy (Chosen: {formData.interests.length}/{APP_CONSTANTS.MAX_INTERESTS}).</p>
 
@@ -853,6 +864,7 @@ const Onboarding = () => {
                 </div>
               </motion.div>
             )}
+          </AnimatePresence>
           </div>
 
           {/* Footer Navigation Button */}

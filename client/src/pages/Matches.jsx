@@ -84,15 +84,31 @@ const Matches = () => {
 
       {/* Header */}
       <header style={{
-        padding: '24px 20px 12px 20px',
-        zIndex: 5,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        padding: '12px 20px 8px 20px',
+        width: '100%',
+        zIndex: 50,
       }}>
-        <div>
-          <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#ffffff', fontFamily: 'Geist, sans-serif' }}>Messages</h1>
-          <p style={{ color: 'var(--text-dim)', fontSize: '13px', marginTop: '2px', fontFamily: 'Inter, sans-serif' }}>Your campus connections</p>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <h1 style={{
+            fontFamily: 'Outfit, sans-serif',
+            fontSize: '36px',
+            fontWeight: '800',
+            color: 'var(--text)',
+            letterSpacing: '-0.5px',
+            textTransform: 'lowercase',
+            margin: 0,
+            lineHeight: '1',
+          }}>messages</h1>
+          <div style={{
+            width: '84px',
+            height: '4px',
+            borderRadius: '2px',
+            marginTop: '4px',
+            background: 'linear-gradient(90deg, #f97316, #ea580c)',
+          }} />
         </div>
       </header>
 
@@ -132,7 +148,7 @@ const Matches = () => {
                   <h2 style={sectionLabelStyle}>NEW MATCHES</h2>
                   <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: '700', fontFamily: 'Geist, sans-serif' }}>{newMatches.length} NEW</span>
                 </div>
-                <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', padding: '4px 0', scrollbarWidth: 'none' }} className="scrollbar-hide">
+                <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', padding: '4px 0', scrollbarWidth: 'none' }} className="hide-scrollbar">
                   {newMatches.map((match) => {
                     const { user } = match;
                     const mainPhoto = user.photos && user.photos.length > 0 ? user.photos[0] : null;

@@ -1,7 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { api, SOCKET_URL } from '../utils/api';
+
+import ChatHeader from '../components/chat/ChatHeader';
+import MessageBubble from '../components/chat/MessageBubble';
+import InputTray from '../components/chat/InputTray';
+import EmojiPicker from '../components/chat/EmojiPicker';
+import ProfileSheet from '../components/chat/ProfileSheet';
+import PhotoViewer from '../components/chat/PhotoViewer';
+import AttachMenu from '../components/chat/AttachMenu';
+import DateSeparator from '../components/chat/DateSeparator';
+import TypingIndicator from '../components/chat/TypingIndicator';
+import ScrollToBottom from '../components/chat/ScrollToBottom';
+import { ActionMenu, ReactPicker } from '../components/chat/ActionMenu';
+
+const ICEBREAKERS = [
+  "What's your branch? How do you like it so far?",
+  "Best chai spot on campus?",
+  "What's the most interesting thing you've learned this semester?",
+  "Favourite way to procrastinate before exams?",
+  "What's your 3 AM scroll-of-shame content?",
+];
 
 const Chat = () => {
   const { matchId } = useParams();
@@ -12,26 +32,45 @@ const Chat = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [typingUsers, setTypingUsers] = useState(new Set());
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const [lastActive, setLastActive] = useState(null);
+
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showAttach, setShowAttach] = useState(false);
+  const [photoViewerUrl, setPhotoViewerUrl] = useState(null);
+
+  const [replyTo, setReplyTo] = useState(null);
+  const [actionMenu, setActionMenu] = useState(null);
+  const [reactPicker, setReactPicker] = useState(null);
+
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const isPaginationLoad = useRef(false);
+  const scrollRafRef = useRef(null);
 
-  const currentUser = JSON.parse(localStorage.getItem('matchalize_user') || '{}');
+  const currentUser = useMemo(() => JSON.parse(localStorage.getItem('matchalize_user') || '{}'), []);
+
+  const scrollToBottom = useCallback((smooth = true) => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: smooth ? 'smooth' : 'instant' });
+    }, 50);
+  }, []);
 
   const fetchMatchDetails = async () => {
     try {
       const activeMatches = await api.get('/matches');
       const currentMatch = activeMatches.find((m) => m._id === matchId);
-      if (currentMatch) {
-        setMatchInfo(currentMatch.user);
-      }
+      if (currentMatch) setMatchInfo(currentMatch.user);
     } catch (err) {
       console.error('Error fetching match details:', err);
     }
   };
-
-  const [page, setPage] = useState(1);
-  const [hasMoreMessages, setHasMoreMessages] = useState(false);
 
   const fetchMessages = async (isInitial = false) => {
     try {
@@ -43,20 +82,12 @@ const Chat = () => {
         setMessages(prev => [...history, ...prev]);
       }
       if (res.hasMore !== undefined) setHasMoreMessages(res.hasMore);
-      if (isInitial) {
-        scrollToBottom();
-      }
+      if (isInitial) scrollToBottom(false);
     } catch (err) {
       console.error('Error fetching messages:', err);
     } finally {
       if (isInitial) setLoading(false);
     }
-  };
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   };
 
   useEffect(() => {
@@ -92,6 +123,41 @@ const Chat = () => {
       }
     });
 
+    socket.on('messages-read', () => {
+      setMessages(prev => prev.map(msg => {
+        if (msg.sender === currentUser._id && !msg.readAt) {
+          return { ...msg, readAt: new Date().toISOString() };
+        }
+        return msg;
+      }));
+    });
+
+    socket.on('reaction-update', ({ msgId, reactions }) => {
+      setMessages(prev => prev.map(msg =>
+        msg._id === msgId ? { ...msg, reactions } : msg
+      ));
+    });
+
+    socket.on('message-deleted', ({ msgId }) => {
+      setMessages(prev => prev.map(msg =>
+        msg._id === msgId ? { ...msg, deleted: true, text: '', image: '' } : msg
+      ));
+    });
+
+    socket.on('online-update', ({ userId: uid, online, lastActive: la }) => {
+      if (uid !== currentUser._id) {
+        setIsOnline(online);
+        setLastActive(la);
+      }
+    });
+
+    socket.on('online-status', ({ userId: uid, online, lastActive: la }) => {
+      if (uid !== currentUser._id) {
+        setIsOnline(online);
+        setLastActive(la);
+      }
+    });
+
     socketRef.current = socket;
 
     return () => {
@@ -101,295 +167,377 @@ const Chat = () => {
   }, [matchId]);
 
   useEffect(() => {
-    scrollToBottom();
+    if (!isPaginationLoad.current) {
+      scrollToBottom(messages.length <= 10);
+    }
+    isPaginationLoad.current = false;
   }, [messages.length]);
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!inputText.trim() || sending) return;
+  useEffect(() => {
+    if (messages.length > 0) scrollToBottom(false);
+  }, [loading]);
 
+  const handleScroll = useCallback(() => {
+    if (scrollRafRef.current) return;
+    scrollRafRef.current = requestAnimationFrame(() => {
+      const el = messagesContainerRef.current;
+      if (!el) { scrollRafRef.current = null; return; }
+      const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+      setShowScrollBtn(distanceFromBottom > 200);
+      if (el.scrollTop < 50 && hasMoreMessages && !loading) {
+        isPaginationLoad.current = true;
+        setPage(prev => prev + 1);
+      }
+      scrollRafRef.current = null;
+    });
+  }, [hasMoreMessages, loading]);
+
+  useEffect(() => {
+    if (page > 1) fetchMessages(false);
+  }, [page]);
+
+  const markAsRead = useCallback(() => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('read-messages', { matchId });
+    }
+  }, [matchId]);
+
+  useEffect(() => {
+    markAsRead();
+  }, [messages.length, markAsRead]);
+
+  const handleSend = async () => {
+    if (!inputText.trim() || sending) return;
     const messageText = inputText.trim();
     setInputText('');
     setSending(true);
 
-    const tempId = Date.now().toString();
+    const tempId = `temp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const optimisticMessage = {
-      _id: tempId,
-      sender: currentUser._id,
-      text: messageText,
-      createdAt: new Date().toISOString(),
+      _id: tempId, sender: currentUser._id, text: messageText,
+      createdAt: new Date().toISOString(), _pending: true, reactions: [],
+      type: 'text', replyTo: replyTo ? {
+        _id: replyTo._id, text: replyTo.text, sender: currentUser._id,
+        type: replyTo.type, image: replyTo.image,
+      } : null,
     };
-    
-    setMessages((prev) => [...prev, optimisticMessage]);
+
+    setMessages(prev => [...prev, optimisticMessage]);
+    const currentReply = replyTo;
+    setReplyTo(null);
 
     try {
-      const sentMessage = await api.post(`/messages/${matchId}`, { text: messageText });
-      setMessages((prev) => 
-        prev.map((msg) => (msg._id === tempId ? sentMessage : msg))
-      );
+      const body = { text: messageText };
+      if (currentReply) body.replyTo = currentReply._id;
+      const sentMessage = await api.post(`/messages/${matchId}`, body);
+
+      setMessages(prev => {
+        const alreadyAdded = prev.some(m => m._id === sentMessage._id);
+        if (alreadyAdded) return prev.filter(m => m._id !== tempId);
+        return prev.map(msg => msg._id === tempId ? sentMessage : msg);
+      });
     } catch (err) {
       console.error('Failed to send message:', err);
-      setMessages((prev) => prev.filter((msg) => msg._id !== tempId));
+      setMessages(prev => prev.filter(msg => msg._id !== tempId));
       setInputText(messageText);
     } finally {
       setSending(false);
     }
   };
 
+  const handleSendImage = async (file) => {
+    setSending(true);
+    try {
+      const uploadRes = await api.upload(file);
+      const tempId = `temp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const optimisticMessage = {
+        _id: tempId, sender: currentUser._id, text: '',
+        image: uploadRes.url, type: 'image',
+        createdAt: new Date().toISOString(), _pending: true, reactions: [],
+      };
+      setMessages(prev => [...prev, optimisticMessage]);
+
+      const sentMessage = await api.post(`/messages/${matchId}`, {
+        type: 'image', image: uploadRes.url,
+      });
+
+      setMessages(prev => {
+        const alreadyAdded = prev.some(m => m._id === sentMessage._id);
+        if (alreadyAdded) return prev.filter(m => m._id !== tempId);
+        return prev.map(msg => msg._id === tempId ? sentMessage : msg);
+      });
+    } catch (err) {
+      console.error('Failed to send image:', err);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleReact = async (msgId, emoji) => {
+    try {
+      await api.post(`/messages/${matchId}/reaction`, { msgId, emoji });
+    } catch (err) {
+      console.error('Reaction failed:', err);
+    }
+  };
+
+  const handleDelete = async (msgId) => {
+    try {
+      await api.delete(`/messages/${matchId}/${msgId}`);
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
+  };
+
+  const handleLongPress = useCallback((msg) => {
+    setActionMenu({ msg, position: { x: 100, y: window.innerHeight / 2 } });
+  }, []);
+
+  const handleAction = (actionId, msg) => {
+    setActionMenu(null);
+    switch (actionId) {
+      case 'copy':
+        navigator.clipboard?.writeText(msg.text || '');
+        break;
+      case 'reply':
+        setReplyTo({
+          _id: msg._id, text: msg.text, type: msg.type,
+          image: msg.image, senderName: msg.sender === currentUser._id ? 'You' : (matchInfo?.name?.split(' ')[0] || 'Partner'),
+        });
+        break;
+      case 'react':
+        setReactPicker({ msgId: msg._id });
+        break;
+      case 'delete':
+        handleDelete(msg._id);
+        break;
+    }
+  };
+
+  const handleEmojiSelect = (emoji) => {
+    setInputText(prev => prev + emoji);
+  };
+
+  const handleUnmatch = async () => {
+    if (window.confirm('Are you sure you want to unmatch? This cannot be undone.')) {
+      try {
+        await api.delete(`/matches/${matchId}`);
+        navigate('/matches');
+      } catch (err) {
+        console.error('Unmatch failed:', err);
+      }
+    }
+  };
+
+  const renderMessages = useMemo(() => {
+    const elements = [];
+
+    messages.forEach((msg, idx) => {
+      const prevMsg = idx > 0 ? messages[idx - 1] : null;
+      const nextMsg = idx < messages.length - 1 ? messages[idx + 1] : null;
+      const isMe = msg.sender === currentUser._id;
+
+      const showDate = !prevMsg ||
+        new Date(msg.createdAt).toDateString() !== new Date(prevMsg.createdAt).toDateString();
+      if (showDate) {
+        elements.push(<DateSeparator key={`date-${msg._id}`} dateStr={msg.createdAt} />);
+      }
+
+      const grouped = prevMsg &&
+        msg.sender === prevMsg.sender &&
+        (new Date(msg.createdAt) - new Date(prevMsg.createdAt)) < 60000 &&
+        !showDate;
+      const groupStart = !grouped;
+      const groupEnd = !nextMsg || nextMsg.sender !== msg.sender ||
+        (new Date(nextMsg.createdAt) - new Date(msg.createdAt)) > 60000;
+
+      elements.push(
+        <MessageBubble
+          key={msg._id}
+          msg={msg}
+          isMe={isMe}
+          isGrouped={grouped}
+          isGroupStart={groupStart}
+          isGroupEnd={groupEnd}
+          currentUserId={currentUser._id}
+          onLongPress={handleLongPress}
+          onImageTap={setPhotoViewerUrl}
+        />
+      );
+    });
+
+    return elements;
+  }, [messages, currentUser._id, handleLongPress]);
+
   return (
     <div style={{
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      backgroundColor: '#000000',
+      height: '100dvh',
+      display: 'flex', flexDirection: 'column',
+      backgroundColor: '#000', overflow: 'hidden',
     }}>
-      {/* Glow Atmosphere Spheres */}
-      <div className="glow-sphere" style={{ top: '-100px', left: '-100px' }} />
-      <div className="glow-sphere" style={{ bottom: '-100px', right: '-100px' }} />
+      <ChatHeader
+        matchInfo={matchInfo}
+        isOnline={isOnline}
+        lastActive={lastActive}
+        onBack={() => navigate('/matches')}
+        onViewProfile={() => setShowProfile(true)}
+        onUnmatch={handleUnmatch}
+      />
 
-      {/* Header */}
-      <header style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '12px 20px 8px 20px',
-        width: '100%',
-        zIndex: 50,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {matchInfo && (
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              backgroundImage: matchInfo.photos?.[0] ? `url(${matchInfo.photos[0]})` : 'none',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              border: '0.5px solid rgba(255,255,255,0.08)',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              {!matchInfo.photos?.[0] && (
-                <span style={{ fontSize: '14px', fontWeight: '700', color: '#f97316' }}>
-                  {matchInfo.name?.[0]?.toUpperCase()}
-                </span>
-              )}
-            </div>
-          )}
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <h1 style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: '34px',
-              fontWeight: '800',
-              color: 'var(--text)',
-              letterSpacing: '-0.5px',
-              textTransform: 'lowercase',
-              margin: 0,
-              lineHeight: '1',
-            }}>
-              {matchInfo ? matchInfo.name.split(' ')[0] : 'Chat'}
-            </h1>
-            <div style={{
-              width: '108px',
-              height: '4px',
-              borderRadius: '2px',
-              marginTop: '4px',
-              background: 'linear-gradient(90deg, #f97316, #ea580c)',
-            }} />
-            <span style={{
-              fontSize: '11px',
-              color: 'var(--text-dim)',
-              fontFamily: 'Inter, sans-serif',
-              marginTop: '4px',
-            }}>
-              {matchInfo?.branch ? `${matchInfo.branch} · ${matchInfo.year || ''}` : 'Your match'}
-            </span>
-          </div>
-        </div>
-
-        <button
-          onClick={() => navigate('/matches')}
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '20px',
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '0.5px solid rgba(255,255,255,0.08)',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-        </button>
-      </header>
-
-      {/* Messages area */}
-      <div 
+      <div
+        ref={messagesContainerRef}
+        onScroll={handleScroll}
         style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          padding: '24px 20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          zIndex: 10,
+          flex: 1, minHeight: 0, overflowY: 'auto',
+          padding: '0 12px 16px',
+          display: 'flex', flexDirection: 'column',
         }}
-        className="chat-messages hide-scrollbar"
+        className="hide-scrollbar"
       >
         {loading ? (
-          <div style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.08)', borderTopColor: 'var(--primary)', animation: 'spin 1s linear infinite' }} />
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{
+              width: '28px', height: '28px', borderRadius: '50%',
+              border: '2px solid rgba(255,255,255,0.08)',
+              borderTopColor: '#f97316',
+              animation: 'spin 1s linear infinite',
+            }} />
           </div>
         ) : messages.length === 0 ? (
           <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            alignSelf: 'stretch',
-            color: 'var(--text-dim)',
-            fontSize: '14px',
-            textAlign: 'center',
-            gap: '10px',
-            padding: '24px',
+            flex: 1, display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            textAlign: 'center', gap: '16px', padding: '24px',
           }}>
-            <span style={{ fontSize: '36px' }}>👋</span>
-            <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#ffffff', fontFamily: 'Geist, sans-serif' }}>Say Hello!</h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-dim)', fontFamily: 'Inter, sans-serif' }}>Break the ice by asking about their branch or prompts.</p>
-          </div>
-        ) : (
-          messages.map((msg) => {
-            const isMe = msg.sender === currentUser._id;
-            return (
-              <div
-                key={msg._id}
-                style={{
-                  display: 'flex',
-                  justifyContent: isMe ? 'flex-end' : 'flex-start',
-                  width: '100%',
-                }}
-              >
-                <div
-                  className={isMe ? '' : 'glass-card'}
+            {matchInfo && (
+              <div style={{
+                width: '72px', height: '72px', borderRadius: '50%',
+                backgroundImage: matchInfo.photos?.[0] ? `url(${matchInfo.photos[0]})` : 'none',
+                backgroundSize: 'cover', backgroundPosition: 'center',
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                border: '2px solid rgba(249,115,22,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {!matchInfo.photos?.[0] && (
+                  <span style={{ fontSize: '28px', fontWeight: '700', color: '#f97316' }}>
+                    {matchInfo.name?.[0]?.toUpperCase()}
+                  </span>
+                )}
+              </div>
+            )}
+            <div>
+              <h3 style={{
+                fontSize: '18px', fontWeight: '700', color: '#fff',
+                fontFamily: 'Inter, sans-serif', margin: '0 0 4px',
+              }}>
+                You matched with {matchInfo?.name?.split(' ')[0] || 'them'}!
+              </h3>
+              <p style={{
+                fontSize: '13px', color: 'rgba(255,255,255,0.4)',
+                fontFamily: 'Inter, sans-serif', margin: 0, lineHeight: 1.5,
+              }}>
+                Start a conversation — say something about their prompts or interests.
+              </p>
+            </div>
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: '8px',
+              width: '100%', maxWidth: '320px', marginTop: '4px',
+            }}>
+              <span style={{
+                fontSize: '11px', fontWeight: '600', color: 'rgba(255,255,255,0.25)',
+                fontFamily: 'Inter, sans-serif', textTransform: 'uppercase',
+                letterSpacing: '0.08em', textAlign: 'left',
+              }}>
+                Ice breakers
+              </span>
+              {ICEBREAKERS.map((text, i) => (
+                <button
+                  key={i}
+                  onClick={() => setInputText(text)}
                   style={{
-                    maxWidth: '85%',
-                    padding: '12px 16px',
-                    borderRadius: isMe ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
-                    backgroundColor: isMe ? 'var(--primary)' : 'rgba(255,255,255,0.02)',
-                    boxShadow: isMe ? '0 4px 15px rgba(249,115,22,0.25)' : 'none',
-                    border: isMe ? 'none' : '0.5px solid rgba(255,255,255,0.06)',
-                    color: isMe ? '#ffffff' : 'rgba(255,255,255,0.9)',
-                    fontSize: '15px',
-                    fontWeight: '500',
-                    lineHeight: '1.45',
-                    wordBreak: 'break-word',
-                    fontFamily: 'Inter, sans-serif',
+                    padding: '10px 14px', borderRadius: '12px',
+                    border: '1px solid rgba(249,115,22,0.2)',
+                    background: 'rgba(249,115,22,0.06)',
+                    color: '#f97316', fontSize: '13px', fontWeight: '500',
+                    fontFamily: 'Inter, sans-serif', textAlign: 'left',
+                    cursor: 'pointer', lineHeight: 1.4, transition: 'all 0.15s ease',
                   }}
                 >
-                  {msg.text}
-                </div>
-              </div>
-            );
-          })
-)}
-                {typingUsers.size > 0 && (
-                  <div style={{
-                    padding: '8px 20px',
-                    color: 'var(--text-dim)',
-                    fontSize: '12px',
-                    fontStyle: 'italic',
-                    fontFamily: 'Inter, sans-serif',
-                    opacity: 0.8,
-                  }}>
-                    {Array.from(typingUsers).join(', ')} typing...
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
+                  {text}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <>
+            {renderMessages}
+            {typingUsers.size > 0 && <TypingIndicator />}
+            <div ref={messagesEndRef} style={{ flexShrink: 0, height: '1px' }} />
+          </>
+        )}
       </div>
 
-      {/* Input tray */}
-      <form
-        onSubmit={handleSend}
-        style={{
-          padding: '16px 20px',
-          paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-          borderTop: '0.5px solid rgba(255,255,255,0.06)',
-          display: 'flex',
-          gap: '12px',
-          backgroundColor: '#000000',
-          zIndex: 100,
-        }}
-      >
-        <div style={{ flex: 1, position: 'relative' }}>
-          <input
-            type="text"
-            placeholder="Type your message..."
-            value={inputText}
-            onChange={(e) => {
-              setInputText(e.target.value);
-              // Emit typing event
-              if (socketRef.current?.connected) {
-                socketRef.current.emit('typing', matchId);
-              }
-              // Clear existing timeout
-              if (typingTimeoutRef.current) {
-                clearTimeout(typingTimeoutRef.current);
-              }
-              // Stop typing after 2 seconds of inactivity
-              typingTimeoutRef.current = setTimeout(() => {
-                if (socketRef.current?.connected) {
-                  socketRef.current.emit('stop-typing', matchId);
-                }
-              }, 2000);
-            }}
-            disabled={loading}
-            style={{
-              width: '100%',
-              backgroundColor: 'rgba(255,255,255,0.02)',
-              border: '0.5px solid rgba(255,255,255,0.06)',
-              borderRadius: '20px',
-              padding: '10px 16px',
-              color: '#ffffff',
-              fontSize: '14px',
-              outline: 'none',
-            }}
-          />
-        </div>
+      <ScrollToBottom
+        visible={showScrollBtn}
+        onClick={() => { scrollToBottom(true); setShowScrollBtn(false); }}
+      />
 
-        <button
-          type="submit"
-          className="gradient-btn"
-          disabled={!inputText.trim() || sending}
-          style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '50%',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: inputText.trim() ? 'pointer' : 'default',
-            opacity: inputText.trim() ? 1 : 0.4,
-            transition: 'all 0.25s ease',
-            flexShrink: 0,
-            boxShadow: 'none',
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#ffffff', fontVariationSettings: "'FILL' 1" }}>send</span>
-        </button>
-      </form>
+      <InputTray
+        inputText={inputText}
+        setInputText={setInputText}
+        onSend={handleSend}
+        onEmojiToggle={() => setShowEmoji(!showEmoji)}
+        onAttach={() => setShowAttach(true)}
+        replyTo={replyTo}
+        onClearReply={() => setReplyTo(null)}
+        sending={sending}
+        loading={loading}
+      />
+
+      {showEmoji && (
+        <EmojiPicker
+          onSelect={handleEmojiSelect}
+          onClose={() => setShowEmoji(false)}
+        />
+      )}
+
+      {showProfile && (
+        <ProfileSheet
+          matchInfo={matchInfo}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
+
+      {photoViewerUrl && (
+        <PhotoViewer
+          imageUrl={photoViewerUrl}
+          onClose={() => setPhotoViewerUrl(null)}
+        />
+      )}
+
+      {showAttach && (
+        <AttachMenu
+          onSelect={handleSendImage}
+          onClose={() => setShowAttach(false)}
+        />
+      )}
+
+      {actionMenu && (
+        <ActionMenu
+          msg={actionMenu.msg}
+          position={actionMenu.position}
+          isMe={actionMenu.msg.sender === currentUser._id}
+          onAction={handleAction}
+          onClose={() => setActionMenu(null)}
+        />
+      )}
+
+      {reactPicker && (
+        <ReactPicker
+          onSelect={(emoji) => handleReact(reactPicker.msgId, emoji)}
+          onClose={() => setReactPicker(null)}
+        />
+      )}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { AppConfigProvider } from './utils/AppConfigContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -34,13 +35,27 @@ const OnboardingRoute = ({ children }) => {
   return children;
 };
 
-function App() {
+const pageVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
   return (
-    <div className="app-container">
-      <ErrorBoundary>
-      <AppConfigProvider>
-      <Router>
-        <Routes>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.12 }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <Routes location={location}>
           {/* Public Routes */}
           <Route path="/" element={<Splash />} />
           <Route path="/auth" element={<Auth />} />
@@ -102,6 +117,18 @@ function App() {
           {/* Catch-all Redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  return (
+    <div className="app-container">
+      <ErrorBoundary>
+      <AppConfigProvider>
+      <Router>
+        <AnimatedRoutes />
       </Router>
       </AppConfigProvider>
       </ErrorBoundary>

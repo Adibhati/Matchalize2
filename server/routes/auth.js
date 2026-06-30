@@ -1,6 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import OTP from '../models/OTP.js';
 import User from '../models/User.js';
 import { validate } from '../middleware/validate.js';
@@ -10,9 +11,9 @@ import { COLLEGE_MAP } from '../config/appData.js';
 
 const router = express.Router();
 
-// Generate 6-digit random code
+// Generate 6-digit cryptographically secure code
 const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 999999).toString();
 };
 
 // Helper to extract college code and name
@@ -107,6 +108,12 @@ router.post(
 
       if (!record) {
         return res.status(400).json({ message: 'No verification code found' });
+      }
+
+      // Check expiry
+      if (record.expiresAt < new Date()) {
+        await OTP.deleteOne({ _id: record._id });
+        return res.status(400).json({ message: 'Verification code has expired. Please request a new one.' });
       }
 
       // Check attempts

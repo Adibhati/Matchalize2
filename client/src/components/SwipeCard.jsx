@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import { useAppConfig } from '../utils/AppConfigContext';
 
@@ -34,6 +34,12 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
     }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    };
+  }, []);
+
   const dismissPreview = useCallback(() => {
     setPreview(null);
   }, []);
@@ -50,14 +56,14 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
   const prompts = user.prompts || [];
   const interests = user.interests || [];
 
-  const handleDragEnd = (event, info) => {
+  const handleDragEnd = useCallback((event, info) => {
     const threshold = 100;
     if (info.offset.x > threshold) {
       onSwipe('right', user._id);
     } else if (info.offset.x < -threshold) {
       onSwipe('left', user._id);
     }
-  };
+  }, [onSwipe, user._id]);
 
   const interestIcon = (interest) => {
     const key = interest.toLowerCase().trim();
@@ -81,16 +87,20 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
       drag={dragEnabled ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragDirectionLock
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}
       style={{
         x,
         rotate,
         position: 'absolute',
         width: '97.9%',
-        height: '100%',
-        top: 0,
+        height: '95.5%',
+        top: '4.5%',
         left: '1.05%',
         zIndex: 10,
-        touchAction: 'pan-y',
+        willChange: 'transform',
+        touchAction: 'pan-y pinch-zoom',
       }}
       onDragEnd={handleDragEnd}
       onDragStart={() => {
@@ -108,13 +118,14 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
           width: '100%',
           height: '100%',
           borderRadius: '28px 28px 0 0',
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.06)',
-          background: 'rgba(18, 18, 24, 0.95)',
-          backdropFilter: 'blur(60px)',
-          WebkitBackdropFilter: 'blur(60px)',
+          border: '1.5px solid rgba(249, 115, 22, 0.4)',
+          borderBottom: 'none',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 20px rgba(249, 115, 22, 0.15)',
+          background: 'rgba(18, 18, 24, 0.97)',
         }}
       >
         {dragEnabled && <></>}
@@ -126,6 +137,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
             overflowY: preview ? 'hidden' : 'auto',
             WebkitOverflowScrolling: 'touch',
             overscrollBehavior: 'auto',
+            touchAction: 'pan-y pinch-zoom',
             transform: 'translateZ(0)',
             willChange: 'scroll-position',
           }}
@@ -199,7 +211,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 </span>
                 {user.age && (
                   <span style={{
-                    fontSize: '25px', fontWeight: '400', color: 'rgba(255,255,255,0.55)',
+                    fontSize: '25px', fontWeight: '400', color: '#f97316',
                     lineHeight: 1.15,
                   }}>
                     {user.age}
@@ -217,7 +229,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                   }}>
                     {user.branch}
                     {user.branch && user.year && <span style={{ margin: '0 5px', color: 'rgba(255,255,255,0.4)' }}>·</span>}
-                    {user.year}
+                    <span style={{ color: '#f97316' }}>{user.year}</span>
                   </span>
                 </div>
               )}
@@ -349,7 +361,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 </div>
                 {extraImgs[0] && (
                   <div
-                    style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
+                    style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none', border: '1.5px solid rgba(249, 115, 22, 0.4)' }}
                     {...previewHandlers({ type: 'image', src: extraImgs[0] })}
 
                   >
@@ -364,7 +376,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               <div className="bento-row" style={{ height: '220px' }}>
                 {extraImgs[1] && (
                   <div
-                    style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
+                    style={{ flex: 1, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none', border: '1.5px solid rgba(249, 115, 22, 0.4)' }}
                     {...previewHandlers({ type: 'image', src: extraImgs[1] })}
 
                   >
@@ -409,7 +421,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
             {/* Last image */}
             {extraImgs[2] && (
               <div
-                className="bento-block" style={{ height: '220px', padding: 0, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none' }}
+                className="bento-block" style={{ height: '220px', padding: 0, borderRadius: '20px', overflow: 'hidden', position: 'relative', cursor: 'pointer', WebkitTouchCallout: 'none', border: '1.5px solid rgba(249, 115, 22, 0.4)' }}
                 {...previewHandlers({ type: 'image', src: extraImgs[2] })}
               >
                 <img src={extraImgs[2]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
@@ -458,8 +470,8 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
 
           {/* Bottom gradient — end of scroll content */}
           <div style={{
-            height: '200px',
-            marginTop: '-150px',
+            height: '100px',
+            marginTop: '-80px',
             background: 'linear-gradient(to top, #000000 0%, #000000 25%, transparent 100%)',
             pointerEvents: 'none',
             flexShrink: 0,
@@ -622,4 +634,4 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
   );
 };
 
-export default SwipeCard;
+export default React.memo(SwipeCard);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { io } from 'socket.io-client';
@@ -18,7 +18,7 @@ const Discover = () => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const currentUser = JSON.parse(localStorage.getItem('matchalize_user') || '{}');
+  const currentUser = useMemo(() => JSON.parse(localStorage.getItem('matchalize_user') || '{}'), []);
   const socketRef = useRef(null);
 
   const fetchDeck = async (resetSwipes = false) => {
@@ -130,7 +130,7 @@ const Discover = () => {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <h1 style={{
             fontFamily: 'Outfit, sans-serif',
-            fontSize: '34px',
+            fontSize: '38px',
             fontWeight: '800',
             color: 'var(--text)',
             letterSpacing: '-0.5px',
@@ -404,10 +404,6 @@ const Discover = () => {
       </AnimatePresence>
 
       <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
         @keyframes heartbeat {
           0% { transform: scale(1); }
           50% { transform: scale(1.2); }

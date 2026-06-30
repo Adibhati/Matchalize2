@@ -59,11 +59,11 @@ export const BRANCHES = [
 ];
 
 export const YEARS = [
-  "1st Year (Freshman)",
-  "2nd Year (Sophomore)",
-  "3rd Year (Junior)",
-  "4th Year (Senior)",
-  "5th Year (Dual Degree/PG)"
+  "Freshies",
+  "Sophies",
+  "Thirdies",
+  "Fourthies",
+  "Fifthies (Dual/PG)"
 ];
 
 export const GENDERS = [
