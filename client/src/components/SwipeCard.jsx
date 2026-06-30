@@ -459,10 +459,10 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
             }}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 16 }}
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 8 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 28, mass: 0.8 }}
+              exit={{ opacity: 0, scale: 0.97, y: 6 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 30, mass: 0.6 }}
               onClick={(e) => e.stopPropagation()}
               onPointerUp={(e) => e.stopPropagation()}
               style={{
@@ -481,12 +481,15 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   background: '#000',
+                  borderRadius: '20px',
+                  overflow: 'hidden',
                 }}>
                   <img src={preview.src} style={{
                     maxWidth: '100%',
                     maxHeight: '70vh',
                     objectFit: 'contain',
                     display: 'block',
+                    borderRadius: '20px',
                   }} alt="Preview" />
                 </div>
               ) : (
