@@ -476,17 +476,15 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {preview.type === 'image' ? (
                 <div style={{
                   width: '100%',
-                  aspectRatio: '3 / 4',
                   maxHeight: '70vh',
-                  overflow: 'hidden',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   background: '#000',
                 }}>
                   <img src={preview.src} style={{
-                    width: '100%',
-                    height: '100%',
+                    maxWidth: '100%',
+                    maxHeight: '70vh',
                     objectFit: 'contain',
                     display: 'block',
                   }} alt="Preview" />
