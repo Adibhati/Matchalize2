@@ -443,21 +443,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
           </div>
 
         </div>
-
-        {/* Bottom blur gradient */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '80px',
-          background: 'linear-gradient(to top, rgba(18,18,24,0.95) 0%, rgba(18,18,24,0.6) 40%, transparent 100%)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          pointerEvents: 'none',
-          zIndex: 5,
-          borderRadius: '0 0 0 0',
-        }} />
       </div>
 
       {/* Preview Overlay — persists until tap or drag dismiss */}
