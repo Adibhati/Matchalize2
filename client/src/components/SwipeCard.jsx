@@ -202,7 +202,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {/* Line 1: Name, age */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                 <span style={{
-                  fontSize: '50px', fontWeight: '700', color: heroTextColor,
+                  fontSize: '35px', fontWeight: '700', color: heroTextColor,
                   letterSpacing: '-0.02em', lineHeight: 1.15,
                   fontFamily: 'Geist, sans-serif',
                 }}>
@@ -210,7 +210,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 </span>
                 {user.age && (
                   <span style={{
-                    fontSize: '19px', fontWeight: '400', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
+                    fontSize: '25px', fontWeight: '400', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
                     lineHeight: 1.15,
                   }}>
                     {user.age}
@@ -244,7 +244,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 }}>
                   <span style={{
                     fontSize: '13px', fontWeight: '400',
-                    color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
+                    color: '#ffffff',
                     fontFamily: 'Inter, sans-serif', fontStyle: 'italic',
                     lineHeight: 1.45,
                   }}>
