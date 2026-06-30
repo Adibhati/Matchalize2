@@ -38,10 +38,11 @@ export const sendOTP = async (email, otp) => {
   if (!res.ok) {
     const err = await res.text();
     console.error('SendGrid API error:', err);
-    console.log(`\n----------------------------------------`);
-    console.log(`[FALLBACK] OTP for ${email}: ${otp}`);
-    console.log(`----------------------------------------\n`);
   }
+
+  console.log(`\n----------------------------------------`);
+  console.log(`[OTP] For ${email}: ${otp}`);
+  console.log(`----------------------------------------\n`);
 
   return true;
 };

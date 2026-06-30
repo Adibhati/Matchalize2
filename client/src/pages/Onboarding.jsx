@@ -215,8 +215,6 @@ const Onboarding = () => {
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '24px 20px',
       position: 'relative',
       overflow: 'hidden',
       backgroundColor: '#000000',
@@ -225,16 +223,10 @@ const Onboarding = () => {
       <div className="glow-sphere" style={{ top: '10%', left: '-100px' }} />
       <div className="glow-sphere" style={{ bottom: '10%', right: '-100px' }} />
 
-      <div style={{ zIndex: 10, width: '100%' }}>
-        {/* Onboarding Glass Panel */}
-        <div className="glass-card" style={{
-          borderRadius: '32px',
-          padding: '28px 24px',
-          boxShadow: '0 20px 48px rgba(0, 0, 0, 0.6)',
-        }}>
-          
-          {/* Header & Step Segment indicator */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px 20px 12px 20px', overflow: 'hidden' }}>
+        
+        {/* Header & Step Segment indicator */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--primary)', letterSpacing: '1.5px', fontFamily: 'Geist, sans-serif' }}>
               STEP {step} OF 7
             </span>
@@ -293,11 +285,11 @@ const Onboarding = () => {
           )}
 
           {/* Form Scroll Viewport */}
-          <div style={{ maxHeight: '380px', overflowY: 'auto', paddingRight: '4px' }} className="step-scroll">
+          <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px', display: 'flex', flexDirection: 'column' }} className="step-scroll">
             
             {/* STEP 1: Basic Info */}
             {step === 1 && (
-              <motion.div initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Let's build your profile</h2>
                 <p style={stepSubtitleStyle}>How should classmates address you?</p>
 
@@ -352,7 +344,7 @@ const Onboarding = () => {
 
             {/* STEP 2: Gender & Pronouns */}
             {step === 2 && (
-              <motion.div initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Gender Identity</h2>
                 <p style={stepSubtitleStyle}>Select the option that represents you best.</p>
 
@@ -435,7 +427,7 @@ const Onboarding = () => {
 
             {/* STEP 3: Campus Details */}
             {step === 3 && (
-              <motion.div initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Campus Details</h2>
                 <p style={stepSubtitleStyle}>Help us find classmates near you.</p>
 
@@ -499,7 +491,7 @@ const Onboarding = () => {
 
             {/* STEP 4: Photos */}
             {step === 4 && (
-              <motion.div initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Add your photos</h2>
                 <p style={stepSubtitleStyle}>Upload up to 4 photos to show your campus style (tap to upload).</p>
 
@@ -585,7 +577,7 @@ const Onboarding = () => {
 
             {/* STEP 5: Prompts */}
             {step === 5 && (
-              <motion.div initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Answer prompts</h2>
                 <p style={stepSubtitleStyle}>Write interesting answers to stand out.</p>
 
@@ -639,7 +631,7 @@ const Onboarding = () => {
 
             {/* STEP 6: Intent & Bio */}
             {step === 6 && (
-              <motion.div initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Interests & Intent</h2>
                 <p style={stepSubtitleStyle}>What are you looking for on campus?</p>
 
@@ -724,7 +716,7 @@ const Onboarding = () => {
 
             {/* STEP 7: Interests */}
             {step === 7 && (
-              <motion.div initial="enter" animate="center" variants={slideVariants}>
+              <motion.div style={{ flex: 1 }} initial="enter" animate="center" variants={slideVariants}>
                 <h2 style={stepTitleStyle}>Choose your interests</h2>
                 <p style={stepSubtitleStyle}>Select up to {APP_CONSTANTS.MAX_INTERESTS} topics that you enjoy (Chosen: {formData.interests.length}/{APP_CONSTANTS.MAX_INTERESTS}).</p>
 
@@ -776,7 +768,7 @@ const Onboarding = () => {
           </div>
 
           {/* Footer Navigation Button */}
-          <div style={{ marginTop: '28px' }}>
+          <div style={{ marginTop: 'auto', paddingTop: '20px' }}>
             <button
               className="btn gradient-btn"
               onClick={nextStep}
@@ -798,7 +790,6 @@ const Onboarding = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
