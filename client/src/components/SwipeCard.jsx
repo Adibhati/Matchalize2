@@ -468,30 +468,19 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               style={{
                 width: '88%', maxWidth: '380px',
                 borderRadius: '20px', overflow: 'hidden',
-                background: '#111',
+                background: '#000',
                 border: '0.5px solid rgba(255,255,255,0.08)',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                ...(preview.type === 'image' ? { aspectRatio: '3 / 4', maxHeight: '70vh' } : {}),
               }}
             >
               {preview.type === 'image' ? (
-                <div style={{
+                <img src={preview.src} style={{
                   width: '100%',
-                  maxHeight: '70vh',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: '#000',
-                  borderRadius: '20px',
-                  overflow: 'hidden',
-                }}>
-                  <img src={preview.src} style={{
-                    maxWidth: '100%',
-                    maxHeight: '70vh',
-                    objectFit: 'contain',
-                    display: 'block',
-                    borderRadius: '20px',
-                  }} alt="Preview" />
-                </div>
+                  height: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
+                }} alt="Preview" />
               ) : (
                 <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '14px', minHeight: '180px', justifyContent: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
