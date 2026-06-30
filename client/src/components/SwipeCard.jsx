@@ -438,7 +438,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
 
           {/* Bottom gradient — end of scroll content */}
           <div style={{
-            height: '80px',
+            height: '200px',
             background: 'linear-gradient(to top, #000000 0%, #000000 25%, transparent 100%)',
             pointerEvents: 'none',
             flexShrink: 0,
