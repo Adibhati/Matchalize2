@@ -237,8 +237,9 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {user.bio && (
                 <div style={{
                   marginTop: '8px',
+                  marginLeft: '-10px',
                   borderLeft: `2px solid ${heroTextColor === '#ffffff' ? '#f97316' : '#ea580c'}`,
-                  paddingLeft: '10px',
+                  paddingLeft: '8px',
                   paddingTop: '2px',
                   paddingBottom: '2px',
                 }}>
