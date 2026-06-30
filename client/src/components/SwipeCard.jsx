@@ -390,15 +390,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 {...previewHandlers({ type: 'image', src: extraImgs[2] })}
               >
                 <img src={extraImgs[2]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '60%',
-                  background: 'linear-gradient(to top, #000000 0%, #000000 30%, rgba(0,0,0,0) 100%)',
-                  pointerEvents: 'none',
-                }} />
               </div>
             )}
 
@@ -443,6 +434,18 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
           </div>
 
         </div>
+
+        {/* Bottom gradient over card */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '120px',
+          background: 'linear-gradient(to top, rgba(18,18,24,1) 0%, rgba(18,18,24,0.8) 35%, transparent 100%)',
+          pointerEvents: 'none',
+          zIndex: 5,
+        }} />
       </div>
 
       {/* Preview Overlay — persists until tap or drag dismiss */}
