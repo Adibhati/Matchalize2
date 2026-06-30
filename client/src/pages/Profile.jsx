@@ -374,7 +374,7 @@ const Profile = () => {
         </div>
       ) : (
         /* READ-ONLY VIEW (Preview mode matches Discover deck exactly) */
-        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', paddingBottom: '60px' }}>
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden', paddingBottom: '0px' }}>
           <SwipeCard
             user={profile}
             active={true}

@@ -90,7 +90,7 @@ const Settings = () => {
       </header>
 
       {/* Main Settings content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px 96px 20px' }} className="settings-scrollable">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px 24px 20px' }} className="settings-scrollable">
         {error && (
           <div style={{ padding: '12px 16px', borderRadius: '12px', backgroundColor: 'rgba(234, 88, 12, 0.1)', border: '1px solid rgba(234, 88, 12, 0.2)', color: 'var(--rose)', fontSize: '14px', marginBottom: '20px' }}>
             ⚠️ {error}

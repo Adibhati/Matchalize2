@@ -24,10 +24,6 @@ const ProfileIcon = ({ active }) => (
 const NavBar = () => {
   return (
     <nav className="glass-panel" style={{
-      position: 'absolute',
-      bottom: 0,
-      left: 0,
-      right: 0,
       height: '60px',
       display: 'flex',
       justifyContent: 'space-around',

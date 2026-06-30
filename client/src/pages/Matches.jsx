@@ -97,7 +97,7 @@ const Matches = () => {
       </header>
 
       {/* Main Messages Content scrollable container */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px 90px 20px', zIndex: 10 }} className="matches-scrollable hide-scrollbar">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px 24px 20px', zIndex: 10 }} className="matches-scrollable hide-scrollbar">
         {loading ? (
           <MatchListSkeleton />
         ) : error ? (
