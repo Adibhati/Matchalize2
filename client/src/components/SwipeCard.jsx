@@ -23,6 +23,9 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
+  }, []);
+
+  const dismissPreview = useCallback(() => {
     setPreview(null);
   }, []);
 
@@ -441,36 +444,45 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
         </div>
       </div>
 
-      {/* Long-press Preview Overlay */}
+      {/* Preview Overlay — persists until tap or drag dismiss */}
       <AnimatePresence>
         {preview && (
           <motion.div
+            key="preview-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            onPointerUp={() => setPreview(null)}
+            transition={{ duration: 0.2 }}
+            onPointerUp={dismissPreview}
             style={{
               position: 'absolute', inset: 0, zIndex: 100,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(0,0,0,0.85)',
-              cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(0,0,0,0.88)',
               touchAction: 'none',
             }}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              key="preview-card"
+              initial={{ opacity: 0, scale: 0.92, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.97, y: 6 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 30, mass: 0.6 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 28, mass: 0.7 }}
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.7}
+              onDragEnd={(e, info) => {
+                if (info.offset.y > 100 || info.velocity.y > 600) {
+                  dismissPreview();
+                }
+              }}
               onClick={(e) => e.stopPropagation()}
-              onPointerUp={(e) => e.stopPropagation()}
               style={{
                 width: '88%', maxWidth: '380px',
                 borderRadius: '20px', overflow: 'hidden',
                 background: '#000',
                 border: '0.5px solid rgba(255,255,255,0.08)',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                cursor: 'grab',
                 ...(preview.type === 'image' ? { aspectRatio: '3 / 4', maxHeight: '70vh' } : {}),
               }}
             >
@@ -480,6 +492,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                   height: '100%',
                   objectFit: 'contain',
                   display: 'block',
+                  pointerEvents: 'none',
                 }} alt="Preview" />
               ) : (
                 <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '14px', minHeight: '180px', justifyContent: 'center' }}>
@@ -492,8 +505,8 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 </div>
               )}
             </motion.div>
-            <div style={{ position: 'absolute', bottom: '36px', fontSize: '10px', color: 'rgba(255,255,255,0.25)', letterSpacing: '1px', fontFamily: 'Geist, sans-serif', textTransform: 'uppercase' }}>
-              Tap to close
+            <div style={{ marginTop: '24px', fontSize: '10px', color: 'rgba(255,255,255,0.25)', letterSpacing: '1px', fontFamily: 'Geist, sans-serif', textTransform: 'uppercase' }}>
+              {preview.type === 'image' ? 'Drag down or tap to close' : 'Tap to close'}
             </div>
           </motion.div>
         )}
