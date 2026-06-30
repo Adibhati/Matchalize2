@@ -69,8 +69,8 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
         rotate,
         position: 'absolute',
         width: '97.9%',
-        height: '97.9%',
-        top: '1.05%',
+        height: '100%',
+        top: 0,
         left: '1.05%',
         zIndex: 10,
         touchAction: 'pan-y',
@@ -154,8 +154,8 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               left: 0,
               right: 0,
               zIndex: 2,
-              background: 'linear-gradient(to top, #000000 0%, #000000 36%, rgba(0,0,0,0) 100%)',
-              padding: '20px 20px calc(60px + 20px) 20px',
+              background: 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
+              padding: '20px 20px calc(60px + 30px) 20px',
               pointerEvents: 'none',
             }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
