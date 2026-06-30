@@ -166,7 +166,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               right: 0,
               zIndex: 2,
               background: 'linear-gradient(to top, #000000 0%, #000000 55%, rgba(0,0,0,0) 100%)',
-              padding: '60px 20px 7px 20px',
+              padding: '15px 20px 2px 20px',
               pointerEvents: 'none',
             }}>
               {/* Line 1: Name, age */}
