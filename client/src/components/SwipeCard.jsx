@@ -390,6 +390,15 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 {...previewHandlers({ type: 'image', src: extraImgs[2] })}
               >
                 <img src={extraImgs[2]} style={{ width: '100%', height: '100%', objectFit: 'cover', WebkitTouchCallout: 'none' }} alt="Moment" />
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: '60%',
+                  background: 'linear-gradient(to top, #000000 0%, #000000 25%, transparent 100%)',
+                  pointerEvents: 'none',
+                }} />
               </div>
             )}
 
@@ -432,14 +441,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
             )}
 
           </div>
-
-          {/* Bottom gradient — sits at end of scroll content */}
-          <div style={{
-            height: '100px',
-            background: 'linear-gradient(to top, #000000 0%, transparent 100%)',
-            marginTop: '-60px',
-            pointerEvents: 'none',
-          }} />
 
         </div>
       </div>
