@@ -483,7 +483,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 border: '0.5px solid rgba(255,255,255,0.08)',
                 boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
                 cursor: 'grab',
-                ...(preview.type === 'image' ? { aspectRatio: '3 / 4', maxHeight: '70vh' } : {}),
+                ...(preview.type === 'image' ? { width: '340px', maxWidth: '90vw', aspectRatio: '3 / 4' } : {}),
               }}
             >
               {preview.type === 'image' ? (
