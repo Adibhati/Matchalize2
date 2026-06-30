@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
 import { useAppConfig } from '../utils/AppConfigContext';
 
@@ -9,7 +9,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
   const x = useMotionValue(0);
   const longPressTimer = useRef(null);
   const [preview, setPreview] = useState(null);
-  const [heroTextColor, setHeroTextColor] = useState('#ffffff');
 
   const rotate = useTransform(x, [-200, 200], [-8, 8]);
 
@@ -36,34 +35,6 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
   }) : () => ({});
 
   const mainImg = user?.photos && user.photos.length > 0 ? user.photos[0] : null;
-
-  useEffect(() => {
-    if (!mainImg) { setHeroTextColor('#ffffff'); return; }
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const sampleHeight = Math.min(100, img.height);
-        canvas.width = img.width;
-        canvas.height = sampleHeight;
-        ctx.drawImage(img, 0, img.height - sampleHeight, img.width, sampleHeight, 0, 0, img.width, sampleHeight);
-        const imageData = ctx.getImageData(0, 0, img.width, sampleHeight);
-        const pixels = imageData.data;
-        let totalLuminance = 0;
-        for (let i = 0; i < pixels.length; i += 4) {
-          totalLuminance += 0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2];
-        }
-        const avg = totalLuminance / (pixels.length / 4);
-        setHeroTextColor(avg > 128 ? '#000000' : '#ffffff');
-      } catch {
-        setHeroTextColor('#ffffff');
-      }
-    };
-    img.onerror = () => setHeroTextColor('#ffffff');
-    img.src = mainImg;
-  }, [mainImg]);
 
   if (!user) return null;
   const extraImgs = user.photos ? user.photos.slice(1) : [];
@@ -157,17 +128,26 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               position: 'relative',
               width: '100%',
               minHeight: '100%',
-              backgroundImage: mainImg ? `url(${mainImg})` : 'none',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundColor: 'rgba(18, 18, 24, 0.95)',
               cursor: dragEnabled ? 'grab' : 'default',
               borderRadius: '28px 28px 0 0',
               overflow: 'hidden',
               flexShrink: 0,
               WebkitTouchCallout: 'none',
+              backgroundColor: 'rgba(18, 18, 24, 0.95)',
             }}
           >
+            {/* Photo layer with melting mask */}
+            {mainImg && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundImage: `url(${mainImg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 50%, rgba(0,0,0,0.7) 68%, rgba(0,0,0,0.3) 85%, transparent 100%)',
+                maskImage: 'linear-gradient(to bottom, black 50%, rgba(0,0,0,0.7) 68%, rgba(0,0,0,0.3) 85%, transparent 100%)',
+              }} />
+            )}
             {!mainImg && (
               <div style={{
                 position: 'absolute',
@@ -191,22 +171,18 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               left: 0,
               right: 0,
               zIndex: 2,
-              background: heroTextColor === '#000000'
-                ? 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.85) 12%, rgba(255,255,255,0.6) 28%, rgba(255,255,255,0.35) 45%, rgba(255,255,255,0.12) 65%, rgba(255,255,255,0) 100%)'
-                : 'linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 12%, rgba(0,0,0,0.6) 28%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.12) 65%, rgba(0,0,0,0) 100%)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
               height: '120px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'flex-end',
               padding: '0 20px 8px 20px',
               pointerEvents: 'none',
+              background: 'linear-gradient(to top, rgba(18,18,24,0.7) 0%, rgba(18,18,24,0.3) 50%, transparent 100%)',
             }}>
               {/* Line 1: Name, age */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                 <span style={{
-                  fontSize: '35px', fontWeight: '700', color: heroTextColor,
+                  fontSize: '35px', fontWeight: '700', color: '#ffffff',
                   letterSpacing: '-0.02em', lineHeight: 1.15,
                   fontFamily: 'Geist, sans-serif',
                 }}>
@@ -214,7 +190,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 </span>
                 {user.age && (
                   <span style={{
-                    fontSize: '25px', fontWeight: '400', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
+                    fontSize: '25px', fontWeight: '400', color: 'rgba(255,255,255,0.55)',
                     lineHeight: 1.15,
                   }}>
                     {user.age}
@@ -226,12 +202,12 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
               {(user.branch || user.year) && (
                 <div style={{ marginTop: '2px' }}>
                   <span style={{
-                    fontSize: '14px', fontWeight: '500', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.75)',
+                    fontSize: '14px', fontWeight: '500',                     color: 'rgba(255,255,255,0.75)',
                     letterSpacing: '0.3px', lineHeight: 1.3,
                     fontFamily: 'Inter, sans-serif',
                   }}>
                     {user.branch}
-                    {user.branch && user.year && <span style={{ margin: '0 5px', color: heroTextColor === '#ffffff' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)' }}>·</span>}
+                    {user.branch && user.year && <span style={{ margin: '0 5px', color: 'rgba(255,255,255,0.4)' }}>·</span>}
                     {user.year}
                   </span>
                 </div>
@@ -242,7 +218,7 @@ const SwipeCard = ({ user, onSwipe, active, dragEnabled = true }) => {
                 <div style={{
                   marginTop: '8px',
                   marginLeft: '-10px',
-                  borderLeft: `2px solid ${heroTextColor === '#ffffff' ? '#f97316' : '#ea580c'}`,
+                  borderLeft: '2px solid #f97316',
                   paddingLeft: '8px',
                   paddingTop: '2px',
                   paddingBottom: '2px',
