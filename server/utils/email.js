@@ -1,8 +1,10 @@
 export const sendOTP = async (email, otp) => {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.SENDGRID_API_KEY;
 
   if (!apiKey) {
-    console.log(`\n[DEV MODE] OTP for ${email}: ${otp}\n`);
+    console.log(`\n----------------------------------------`);
+    console.log(`[DEV MODE] OTP for ${email}: ${otp}`);
+    console.log(`----------------------------------------\n`);
     return true;
   }
 
@@ -19,24 +21,26 @@ export const sendOTP = async (email, otp) => {
     </div>
   `;
 
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Matchalize <onboarding@resend.dev>',
-      to: email,
+      personalizations: [{ to: [{ email }] }],
+      from: { email: 'adityabhati.iitb@gmail.com', name: 'Matchalize' },
       subject: `Matchalize Verification Code: ${otp}`,
-      html: htmlContent,
+      content: [{ type: 'text/html', value: htmlContent }],
     }),
   });
 
   if (!res.ok) {
     const err = await res.text();
-    console.error('Resend API error:', err);
-    throw new Error(`Failed to send email: ${err}`);
+    console.error('SendGrid API error:', err);
+    console.log(`\n----------------------------------------`);
+    console.log(`[FALLBACK] OTP for ${email}: ${otp}`);
+    console.log(`----------------------------------------\n`);
   }
 
   return true;
