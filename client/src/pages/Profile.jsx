@@ -143,7 +143,7 @@ const Profile = () => {
             textTransform: 'lowercase',
             margin: 0,
             lineHeight: '1',
-          }}>your profile</h1>
+          }}>profile</h1>
           <div style={{
             width: '108px',
             height: '4px',

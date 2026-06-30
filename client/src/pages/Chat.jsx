@@ -184,18 +184,28 @@ const Chat = () => {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <h1 style={{
               fontFamily: 'Outfit, sans-serif',
-              fontSize: '20px',
-              fontWeight: '700',
+              fontSize: '34px',
+              fontWeight: '800',
               color: 'var(--text)',
+              letterSpacing: '-0.5px',
+              textTransform: 'lowercase',
               margin: 0,
-              lineHeight: '1.2',
+              lineHeight: '1',
             }}>
               {matchInfo ? matchInfo.name.split(' ')[0] : 'Chat'}
             </h1>
+            <div style={{
+              width: '108px',
+              height: '4px',
+              borderRadius: '2px',
+              marginTop: '4px',
+              background: 'linear-gradient(90deg, #f97316, #ea580c)',
+            }} />
             <span style={{
               fontSize: '11px',
               color: 'var(--text-dim)',
               fontFamily: 'Inter, sans-serif',
+              marginTop: '4px',
             }}>
               {matchInfo?.branch ? `${matchInfo.branch} · ${matchInfo.year || ''}` : 'Your match'}
             </span>
@@ -227,6 +237,7 @@ const Chat = () => {
       <div 
         style={{
           flex: 1,
+          minHeight: 0,
           overflowY: 'auto',
           padding: '24px 20px',
           display: 'flex',
@@ -246,7 +257,8 @@ const Chat = () => {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '100%',
+            flex: 1,
+            alignSelf: 'stretch',
             color: 'var(--text-dim)',
             fontSize: '14px',
             textAlign: 'center',
@@ -312,6 +324,7 @@ const Chat = () => {
         onSubmit={handleSend}
         style={{
           padding: '16px 20px',
+          paddingBottom: 'env(safe-area-inset-bottom, 16px)',
           borderTop: '0.5px solid rgba(255,255,255,0.06)',
           display: 'flex',
           gap: '12px',
